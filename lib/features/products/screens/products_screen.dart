@@ -385,8 +385,8 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                     max: 10000,
                     divisions: 100,
                     labels: RangeLabels(
-                      'Rs. ${_priceRange.start.round()}',
-                      'Rs. ${_priceRange.end.round()}',
+                      '₹${_priceRange.start.round()}',
+                      '₹${_priceRange.end.round()}',
                     ),
                     onChanged: (values) {
                       setState(() {
@@ -397,8 +397,8 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Rs. ${_priceRange.start.round()}'),
-                      Text('Rs. ${_priceRange.end.round()}'),
+                      Text('₹${_priceRange.start.round()}'),
+                      Text('₹${_priceRange.end.round()}'),
                     ],
                   ),
 

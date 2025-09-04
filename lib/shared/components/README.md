@@ -55,8 +55,8 @@ ProductCard(
   rating: 4.5,
   sold: '2.3k+',
   name: 'Product Name',
-  currentPrice: 'Rs. 999',
-  originalPrice: 'Rs. 1499',
+  currentPrice: '₹999',
+  originalPrice: '₹1499',
   badge: 'Popular',
   badgeColor: Colors.orange,
   onTap: () {

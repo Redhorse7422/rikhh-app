@@ -30,13 +30,19 @@ class DioClient {
         // Network optimization for Dio 5.x
         followRedirects: true,
         maxRedirects: 5,
+        // Add persistent connection settings
+        persistentConnection: true,
+        // Add extra options for better error handling
+        extra: {
+          'withCredentials': false,
+        },
       ),
     );
 
     // Add interceptors for logging, authentication, etc.
     dio.interceptors.addAll([
       _LoggingInterceptor(),
-      _AuthInterceptor(),
+      _AuthInterceptor(dio),
       _ErrorInterceptor(),
       _RetryInterceptor(),
     ]);
@@ -71,14 +77,26 @@ class _LoggingInterceptor extends Interceptor {
 }
 
 class _AuthInterceptor extends Interceptor {
+  final Dio _dio;
+  
+  _AuthInterceptor(this._dio);
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    // Ensure Authorization header is set from the instance headers
+    final authHeader = _dio.options.headers['Authorization'];
+    if (authHeader != null && !options.headers.containsKey('Authorization')) {
+      options.headers['Authorization'] = authHeader;
+    }
+    print('🔍 Auth Interceptor: Headers for ${options.path}: ${options.headers}');
     handler.next(options);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    if (err.response?.statusCode == 401) {}
+    if (err.response?.statusCode == 401) {
+      print('🔍 Auth Error: 401 Unauthorized for ${err.requestOptions.path}');
+    }
     handler.next(err);
   }
 }
@@ -112,7 +130,10 @@ class _ErrorInterceptor extends Interceptor {
         print('💡 Check if server is running and accessible');
         break;
       case DioExceptionType.unknown:
-        print('❓ Unknown error');
+        print('❓ Unknown error - This usually indicates a network or parsing issue');
+        print('🔍 Request URL: ${err.requestOptions.uri}');
+        print('🔍 Request method: ${err.requestOptions.method}');
+        print('🔍 Request headers: ${err.requestOptions.headers}');
         break;
       case DioExceptionType.badCertificate:
         print('🔒 Bad certificate');
@@ -122,9 +143,12 @@ class _ErrorInterceptor extends Interceptor {
     // Log additional error details
     print('🔍 Error details: ${err.message}');
     print('🔍 Error type: ${err.type}');
+    print('🔍 Request path: ${err.requestOptions.path}');
     if (err.response != null) {
       print('🔍 Response status: ${err.response?.statusCode}');
       print('🔍 Response data: ${err.response?.data}');
+    } else {
+      print('🔍 No response received');
     }
 
     handler.next(err);
@@ -168,7 +192,8 @@ class _RetryInterceptor extends Interceptor {
   bool _shouldRetry(DioException err) {
     return err.type == DioExceptionType.connectionTimeout ||
         err.type == DioExceptionType.receiveTimeout ||
-        err.type == DioExceptionType.connectionError;
+        err.type == DioExceptionType.connectionError ||
+        err.type == DioExceptionType.unknown; // Retry on unknown errors too
   }
 
   int _getRetryCount(RequestOptions options) {

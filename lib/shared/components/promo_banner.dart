@@ -34,8 +34,8 @@ class PromoBannerWidget extends StatelessWidget {
     super.key,
     required this.banner,
     this.onButtonPressed,
-    this.height = 200,
-    this.imageSize = 120,
+    this.height = 160,
+    this.imageSize = 149,
     this.margin = const EdgeInsets.only(right: 16),
   });
 
@@ -62,7 +62,7 @@ class PromoBannerWidget extends StatelessWidget {
                 children: [
                   Text(
                     banner.topTitle,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
                   ),
                   Text(
                     banner.title,

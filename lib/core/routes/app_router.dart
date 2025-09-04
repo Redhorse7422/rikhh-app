@@ -7,6 +7,7 @@ import '../navigation/main_navigation.dart';
 import '../../features/auth/screens/main_auth_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/signup_screen.dart';
+import '../../features/cart/screens/cart_screen.dart';
 
 class AppRouter {
   static const String startup = '/';
@@ -105,11 +106,7 @@ class AppRouter {
       GoRoute(
         path: cart,
         name: 'cart',
-        builder: (context, state) => const Scaffold(
-          body: Center(
-            child: Text('Cart Screen - Coming Soon'),
-          ),
-        ),
+        builder: (context, state) => const CartScreen(),
       ),
       
       GoRoute(

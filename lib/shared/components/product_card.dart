@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:rikhh_app/core/utils/to_camel_case.dart';
 import 'package:rikhh_app/shared/components/skewed_badge.dart';
 import 'package:rikhh_app/shared/components/optimized_image.dart';
 import 'package:rikhh_app/core/services/image_optimization_service.dart';
@@ -36,10 +37,10 @@ class ProductCard extends StatelessWidget {
     final imageHeight = Responsive.getProductCardImageHeight(context);
     final padding = Responsive.getProductCardPadding(context);
     final fontSize = Responsive.getProductCardFontSize(context, baseSize: 12.0);
-    final priceFontSize = Responsive.getProductCardFontSize(
-      context,
-      baseSize: 15.0,
-    );
+    // final priceFontSize = Responsive.getProductCardFontSize(
+    //   context,
+    //   baseSize: 16.0,
+    // );
 
     return GestureDetector(
       onTap: onTap,
@@ -100,8 +101,8 @@ class ProductCard extends StatelessWidget {
                 // Badge positioned over image
                 if (badge != null)
                   Positioned(
-                    top: 6,
-                    left: 6,
+                    top: 0,
+                    left: 0,
                     child: SkewedBadge(
                       text: badge!,
                       color: badgeColor ?? Colors.red,
@@ -123,8 +124,8 @@ class ProductCard extends StatelessWidget {
                       children: [
                         Icon(
                           Feather.star,
-                          color: const Color(0XFFFB6514),
-                          size: fontSize,
+                          color: const Color(0XFFFB6515),
+                          size: fontSize + 4,
                         ),
                         SizedBox(width: padding * 0.5),
                         Text(
@@ -141,7 +142,7 @@ class ProductCard extends StatelessWidget {
                             '$sold Sold',
                             style: TextStyle(
                               color: AppColors.body,
-                              fontSize: fontSize - 2,
+                              fontSize: fontSize,
                               fontWeight: FontWeight.w500,
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -150,16 +151,16 @@ class ProductCard extends StatelessWidget {
                       ],
                     ),
 
-                    SizedBox(height: padding * 0.75),
+                    // SizedBox(height: padding * 0.75),
 
                     // Product Name
                     Text(
-                      name,
+                      toCamelCase(name),
                       style: TextStyle(
-                        color: AppColors.heading,
-                        fontSize: fontSize + 2,
+                        color: AppColors.black,
+                        fontSize: fontSize + 6,
                         fontWeight: FontWeight.w600,
-                        height: 1.2,
+                        // height: 1.2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -175,8 +176,8 @@ class ProductCard extends StatelessWidget {
                           currentPrice,
                           style: TextStyle(
                             color: AppColors.primary,
-                            fontSize: priceFontSize,
-                            fontWeight: FontWeight.bold,
+                            fontSize: fontSize + 6,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                         if (originalPrice.isNotEmpty) ...[

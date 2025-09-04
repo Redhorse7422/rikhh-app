@@ -18,8 +18,15 @@ class AppConfig {
     }
 
     // Development URL selection
-
     return 'http://$devLanIp:3001/api';
+  }
+  
+  // Test if the server is reachable
+  static String get serverTestUrl {
+    if (!isDevelopment) {
+      return 'http://13.201.5.235:3001';
+    }
+    return 'http://$devLanIp:3001';
   }
 
   static const String apiVersion = 'v1';

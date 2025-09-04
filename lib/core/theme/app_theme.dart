@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Brand Colors
@@ -45,79 +44,98 @@ class AppTheme {
         onError: Colors.white,
       ),
 
-      // Typography
-      textTheme: GoogleFonts.interTextTheme().copyWith(
-        displayLarge: GoogleFonts.inter(
+      // Typography - SF Pro Font Family (with system font fallbacks)
+      textTheme: const TextTheme(
+        // Display styles - using SF Pro Display for large text (fallback to system font)
+        displayLarge: TextStyle(
+          fontFamily: 'SF Pro Display',
           fontSize: 32,
           fontWeight: FontWeight.bold,
           color: primaryTextColor,
         ),
-        displayMedium: GoogleFonts.inter(
+        displayMedium: TextStyle(
+          fontFamily: 'SF Pro Display',
           fontSize: 28,
           fontWeight: FontWeight.w600,
           color: primaryTextColor,
         ),
-        displaySmall: GoogleFonts.inter(
+        displaySmall: TextStyle(
+          fontFamily: 'SF Pro Display',
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: primaryTextColor,
         ),
-        headlineLarge: GoogleFonts.inter(
+        headlineLarge: TextStyle(
+          fontFamily: 'SF Pro Display',
           fontSize: 22,
           fontWeight: FontWeight.w600,
           color: primaryTextColor,
         ),
-        headlineMedium: GoogleFonts.inter(
+        headlineMedium: TextStyle(
+          fontFamily: 'SF Pro Display',
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: primaryTextColor,
         ),
-        headlineSmall: GoogleFonts.inter(
+        headlineSmall: TextStyle(
+          fontFamily: 'SF Pro Display',
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: primaryTextColor,
         ),
-        titleLarge: GoogleFonts.inter(
+        // Title styles - using SF Pro Text for medium text (fallback to system font)
+        titleLarge: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 16,
           fontWeight: FontWeight.w600,
           color: primaryTextColor,
         ),
-        titleMedium: GoogleFonts.inter(
+        titleMedium: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: primaryTextColor,
         ),
-        titleSmall: GoogleFonts.inter(
+        titleSmall: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 12,
           fontWeight: FontWeight.w500,
           color: secondaryTextColor,
         ),
-        bodyLarge: GoogleFonts.inter(
+        // Body styles - using SF Pro Text for body text (fallback to system font)
+        bodyLarge: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 16,
           fontWeight: FontWeight.normal,
           color: primaryTextColor,
         ),
-        bodyMedium: GoogleFonts.inter(
+        bodyMedium: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 14,
           fontWeight: FontWeight.normal,
           color: primaryTextColor,
         ),
-        bodySmall: GoogleFonts.inter(
+        bodySmall: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 12,
           fontWeight: FontWeight.normal,
           color: secondaryTextColor,
         ),
-        labelLarge: GoogleFonts.inter(
+        // Label styles - using SF Pro Text for labels (fallback to system font)
+        labelLarge: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: primaryTextColor,
         ),
-        labelMedium: GoogleFonts.inter(
+        labelMedium: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 12,
           fontWeight: FontWeight.w500,
           color: secondaryTextColor,
         ),
-        labelSmall: GoogleFonts.inter(
+        labelSmall: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 10,
           fontWeight: FontWeight.w500,
           color: secondaryTextColor,
@@ -131,6 +149,7 @@ class AppTheme {
         elevation: 0,
         centerTitle: true,
         titleTextStyle: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: primaryTextColor,
@@ -153,7 +172,11 @@ class AppTheme {
           elevation: 2,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+            fontFamily: 'SF Pro Text',
+            fontSize: 16, 
+            fontWeight: FontWeight.w600
+          ),
         ),
       ),
 
@@ -164,7 +187,11 @@ class AppTheme {
           side: const BorderSide(color: primaryColor, width: 1.5),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+            fontFamily: 'SF Pro Text',
+            fontSize: 16, 
+            fontWeight: FontWeight.w600
+          ),
         ),
       ),
 
@@ -221,82 +248,101 @@ class AppTheme {
         onError: Colors.white,
       ),
 
-      // Typography (same as light theme but with white text)
-      textTheme: GoogleFonts.interTextTheme().copyWith(
-        displayLarge: GoogleFonts.inter(
+      // Typography - SF Pro Font Family (Dark Theme with system font fallbacks)
+      textTheme: const TextTheme(
+        // Display styles - using SF Pro Display for large text (fallback to system font)
+        displayLarge: TextStyle(
+          fontFamily: 'SF Pro Display',
           fontSize: 32,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
-        displayMedium: GoogleFonts.inter(
+        displayMedium: TextStyle(
+          fontFamily: 'SF Pro Display',
           fontSize: 28,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
-        displaySmall: GoogleFonts.inter(
+        displaySmall: TextStyle(
+          fontFamily: 'SF Pro Display',
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
-        headlineLarge: GoogleFonts.inter(
+        headlineLarge: TextStyle(
+          fontFamily: 'SF Pro Display',
           fontSize: 22,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
-        headlineMedium: GoogleFonts.inter(
+        headlineMedium: TextStyle(
+          fontFamily: 'SF Pro Display',
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
-        headlineSmall: GoogleFonts.inter(
+        headlineSmall: TextStyle(
+          fontFamily: 'SF Pro Display',
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
-        titleLarge: GoogleFonts.inter(
+        // Title styles - using SF Pro Text for medium text (fallback to system font)
+        titleLarge: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 16,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
-        titleMedium: GoogleFonts.inter(
+        titleMedium: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: Colors.white,
         ),
-        titleSmall: GoogleFonts.inter(
+        titleSmall: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 12,
           fontWeight: FontWeight.w500,
-          color: Colors.grey[300],
+          color: Colors.grey,
         ),
-        bodyLarge: GoogleFonts.inter(
+        // Body styles - using SF Pro Text for body text (fallback to system font)
+        bodyLarge: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 16,
           fontWeight: FontWeight.normal,
           color: Colors.white,
         ),
-        bodyMedium: GoogleFonts.inter(
+        bodyMedium: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 14,
           fontWeight: FontWeight.normal,
           color: Colors.white,
         ),
-        bodySmall: GoogleFonts.inter(
+        bodySmall: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 12,
           fontWeight: FontWeight.normal,
-          color: Colors.grey[300],
+          color: Colors.grey,
         ),
-        labelLarge: GoogleFonts.inter(
+        // Label styles - using SF Pro Text for labels (fallback to system font)
+        labelLarge: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: Colors.white,
         ),
-        labelMedium: GoogleFonts.inter(
+        labelMedium: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 12,
           fontWeight: FontWeight.w500,
-          color: Colors.grey[300],
+          color: Colors.grey,
         ),
-        labelSmall: GoogleFonts.inter(
+        labelSmall: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 10,
           fontWeight: FontWeight.w500,
-          color: Colors.grey[300],
+          color: Colors.grey,
         ),
       ),
 
@@ -307,6 +353,7 @@ class AppTheme {
         elevation: 0,
         centerTitle: true,
         titleTextStyle: TextStyle(
+          fontFamily: 'SF Pro Text',
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: Colors.white,
@@ -329,7 +376,11 @@ class AppTheme {
           elevation: 2,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+            fontFamily: 'SF Pro Text',
+            fontSize: 16, 
+            fontWeight: FontWeight.w600
+          ),
         ),
       ),
 
@@ -340,7 +391,11 @@ class AppTheme {
           side: const BorderSide(color: primaryColor, width: 1.5),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+            fontFamily: 'SF Pro Text',
+            fontSize: 16, 
+            fontWeight: FontWeight.w600
+          ),
         ),
       ),
 

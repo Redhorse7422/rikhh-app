@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/product_model.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../cart/bloc/cart_cubit.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -190,7 +192,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   children: [
                     // Current Price (sale or regular)
                     Text(
-                      'Rs. ${widget.product.price.toStringAsFixed(0)}',
+                      '₹${widget.product.price.toStringAsFixed(0)}',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -216,7 +218,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     // Original Price (strike-through) when on sale
                     if (hasSale && widget.product.originalPrice != null)
                       Text(
-                        'Typical Price: Rs. ${widget.product.originalPrice!.toStringAsFixed(0)}',
+                        'Typical Price: ₹${widget.product.originalPrice!.toStringAsFixed(0)}',
                         style: TextStyle(
                           fontSize: 14,
                           color: AppColors.body,
@@ -431,7 +433,35 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         children: [
           Expanded(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () async {
+                if (!(widget.product.inStock ?? true)) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('This product is out of stock.'),
+                      ),
+                    );
+                  }
+                  return;
+                }
+                try {
+                  await context.read<CartCubit>().add(
+                    productId: widget.product.id,
+                    quantity: _quantity,
+                  );
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Added to cart')),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to add to cart: $e')),
+                    );
+                  }
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,

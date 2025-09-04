@@ -274,7 +274,7 @@ class Responsive {
       case DeviceSize.semiMedium:
         return 140.0;
       case DeviceSize.medium:
-        return 150.0;
+        return 145.0;
       case DeviceSize.large:
         return 160.0;
       case DeviceSize.xLarge:

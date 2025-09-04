@@ -96,12 +96,12 @@ class Product extends Equatable {
   bool get isOnSale => hasDiscount;
 
   // Get formatted price
-  String get formattedPrice => 'Rs. ${price.toStringAsFixed(0)}';
+  String get formattedPrice => '₹${price.toStringAsFixed(0)}';
 
   // Get formatted original price
   String get formattedOriginalPrice {
     if (originalPrice == null) return '';
-    return 'Rs. ${originalPrice!.toStringAsFixed(0)}';
+    return '₹${originalPrice!.toStringAsFixed(0)}';
   }
 
   // Get formatted discount

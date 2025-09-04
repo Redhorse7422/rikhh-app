@@ -9,11 +9,18 @@ class AuthApiService {
     required String password,
   }) async {
     try {
+      print('🔍 AuthApiService: Attempting login for email: $email');
+      print('🔍 AuthApiService: Request URL: ${_dio.options.baseUrl}/auth/login');
+      print('🔍 AuthApiService: Request headers: ${_dio.options.headers}');
+      
       final response = await _dio.post(
         '/auth/login',
         data: {'email': email, 'password': password, 'userType': 'buyer'},
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
+      
+      print('🔍 AuthApiService: Login response received: ${response.statusCode}');
+      print('🔍 AuthApiService: Response data: ${response.data}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data is Map<String, dynamic>
@@ -37,6 +44,16 @@ class AuthApiService {
 
       throw Exception('Login failed: ${response.statusCode}');
     } catch (e) {
+      print('🔍 AuthApiService: Login error: $e');
+      if (e is DioException) {
+        print('🔍 AuthApiService: DioException type: ${e.type}');
+        print('🔍 AuthApiService: DioException message: ${e.message}');
+        print('🔍 AuthApiService: Request URL: ${e.requestOptions.uri}');
+        if (e.response != null) {
+          print('🔍 AuthApiService: Response status: ${e.response?.statusCode}');
+          print('🔍 AuthApiService: Response data: ${e.response?.data}');
+        }
+      }
       rethrow;
     }
   }

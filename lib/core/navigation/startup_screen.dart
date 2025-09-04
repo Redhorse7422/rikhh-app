@@ -23,14 +23,19 @@ class _StartupScreenState extends State<StartupScreen> {
   }
 
   Future<void> _bootstrap() async {
+    print('🔍 StartupScreen: Starting bootstrap...');
+    
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString(AppConfig.tokenKey);
+    print('🔍 StartupScreen: Token found: ${token != null ? 'Yes (${token.length} chars)' : 'No'}');
 
     // Configure Dio with token if present
     DioClient.updateAuthToken(token);
+    print('🔍 StartupScreen: DioClient configured with token');
 
     // Check authentication status
     if (mounted) {
+      print('🔍 StartupScreen: Checking auth status...');
       context.read<AuthBloc>().add(AuthCheckStatusRequested());
     }
   }

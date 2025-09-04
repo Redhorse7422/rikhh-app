@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import '../../features/home/screens/home_screen.dart';
 import '../../features/products/screens/categories_screen.dart';
 import '../../features/cart/screens/cart_screen.dart';
+import '../../features/cart/bloc/cart_cubit.dart';
+import '../../features/auth/bloc/auth_bloc.dart';
 import '../../features/orders/screens/orders_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../theme/app_colors.dart';
@@ -26,10 +29,40 @@ class _MainNavigationState extends State<MainNavigation> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Load cart data when navigation initializes (only if user is authenticated)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Check if user is authenticated before loading cart
+      final authState = context.read<AuthBloc>().state;
+      if (authState is AuthAuthenticated) {
+        print('🔍 MainNavigation: User is authenticated, loading cart...');
+        context.read<CartCubit>().load();
+      } else {
+        print('🔍 MainNavigation: User is not authenticated, skipping cart load');
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _screens),
-      bottomNavigationBar: _buildBottomNavigation(),
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        print('🔍 MainNavigation: Auth state changed to: ${state.runtimeType}');
+        // Load cart when user becomes authenticated
+        if (state is AuthAuthenticated) {
+          print('🔍 MainNavigation: User authenticated, loading cart...');
+          context.read<CartCubit>().load();
+        } else if (state is AuthUnauthenticated) {
+          print('🔍 MainNavigation: User unauthenticated, clearing cart...');
+          // Clear cart when user logs out
+          context.read<CartCubit>().clear();
+        }
+      },
+      child: Scaffold(
+        body: IndexedStack(index: _currentIndex, children: _screens),
+        bottomNavigationBar: _buildBottomNavigation(),
+      ),
     );
   }
 
@@ -75,29 +108,40 @@ class _MainNavigationState extends State<MainNavigation> {
             label: 'Categories',
           ),
           BottomNavigationBarItem(
-            icon: Stack(
-              children: [
-                const Icon(Feather.shopping_bag),
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Text(
-                      '3',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 8,
-                        fontWeight: FontWeight.bold,
+            icon: BlocBuilder<CartCubit, CartState>(
+              builder: (context, state) {
+                final itemCount = state.summary?.itemsCount ?? 0;
+                return Stack(
+                  children: [
+                    const Icon(Feather.shopping_bag),
+                    if (itemCount > 0)
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          child: Text(
+                            itemCount > 99 ? '99+' : itemCount.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ],
+                  ],
+                );
+              },
             ),
             label: 'Cart',
           ),

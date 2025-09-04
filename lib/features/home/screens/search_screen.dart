@@ -401,9 +401,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   controller: _searchController,
                   focusNode: _searchFocusNode,
                   decoration: InputDecoration(
-                    hintText: _selectedCategory != null
-                        ? 'Search in $_selectedCategory...'
-                        : 'Type at least 3 characters to search...',
+                    // hintText: _selectedCategory != null
+                    //     ? 'Search in $_selectedCategory...'
+                    //     : 'Type at least 3 characters to search...',
                     hintStyle: TextStyle(color: AppColors.body),
                     prefixIcon: Icon(Feather.search, color: AppColors.body),
                     suffixIcon: _searchController.text.isNotEmpty
@@ -503,10 +503,10 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                                      GestureDetector(
-                      onTap: _clearCategory,
-                      child: Icon(Feather.x, size: 16, color: AppColors.primary),
-                    ),
+                  GestureDetector(
+                    onTap: _clearCategory,
+                    child: Icon(Feather.x, size: 16, color: AppColors.primary),
+                  ),
                 ],
               ),
             ),
@@ -635,7 +635,8 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                         if (_selectedCategory != null)
                           Text(
-                            _currentQuery.isNotEmpty && _currentQuery.length >= 3
+                            _currentQuery.isNotEmpty &&
+                                    _currentQuery.length >= 3
                                 ? 'in $_selectedCategory'
                                 : 'Category: $_selectedCategory',
                             style: TextStyle(
@@ -892,17 +893,17 @@ class _SearchScreenState extends State<SearchScreen> {
           runSpacing: 12,
           children: _searchHistory.take(6).map((search) {
             return GestureDetector(
-                             onTap: () {
-                 if (mounted) {
-                   setState(() {
-                     _currentQuery = search;
-                     _searchController.text = search;
-                     // Don't automatically clear category selection
-                     // Let user decide if they want to keep category filter
-                   });
-                 }
-                 _performSearch();
-               },
+              onTap: () {
+                if (mounted) {
+                  setState(() {
+                    _currentQuery = search;
+                    _searchController.text = search;
+                    // Don't automatically clear category selection
+                    // Let user decide if they want to keep category filter
+                  });
+                }
+                _performSearch();
+              },
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,

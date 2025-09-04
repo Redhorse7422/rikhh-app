@@ -9,6 +9,7 @@ import 'features/auth/bloc/auth_bloc.dart';
 import 'features/auth/repositories/auth_repository.dart';
 import 'features/home/bloc/location_bloc.dart';
 import 'core/routes/app_router.dart';
+import 'features/cart/bloc/cart_cubit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
           create: (context) => AuthBloc(repo: AuthRepository()),
         ),
         BlocProvider<LocationBloc>(create: (context) => LocationBloc()),
+        BlocProvider<CartCubit>(create: (context) => CartCubit()),
       ],
       child: MaterialApp.router(
         title: AppConfig.appName,

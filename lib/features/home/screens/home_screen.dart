@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       PromoBanner(
         topTitle: 'Free ',
         title: 'Delivery',
-        subtitle: 'On orders above Rs. 999',
+        subtitle: 'On orders above ₹999',
         buttonText: 'Shop Now',
         buttonColor: Colors.purple,
         gradientColors: [Colors.purple, Colors.purple.withValues(alpha: 0.8)],
@@ -391,7 +391,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             onClear: _clearSearch,
             margin: EdgeInsets.zero,
             readOnly: false, // Make it editable
-            hintText: 'Type at least 3 characters to search...',
+            // hintText: 'Type at least 3 characters to search...',
           ),
 
           // Typing indicator when user is typing but hasn't reached 3 chars
@@ -443,6 +443,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late final List<PromoBanner> _promoBanners;
 
   Widget _buildCategoriesSection() {
+    final fontSize = Responsive.getProductCardFontSize(context, baseSize: 12.0);
     return BlocBuilder<CategoriesBloc, CategoriesState>(
       builder: (context, state) {
         List<String> categories = ['All'];
@@ -487,7 +488,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     'Categories',
                     style: TextStyle(
                       color: AppColors.heading,
-                      fontSize: 20,
+                      fontSize: fontSize + 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -499,6 +500,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     child: Text(
                       'See all',
                       style: TextStyle(
+                        fontSize: fontSize + 6,
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
                       ),
@@ -533,30 +535,31 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       ),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Featured Products',
-                style: TextStyle(
-                  color: AppColors.heading,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  'See all',
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Responsive.vSpace(context, 16),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     Text(
+          //       'Featured Products',
+          //       style: TextStyle(
+          //         color: AppColors.heading,
+          //         fontSize: fontSize + 11,
+          //         fontWeight: FontWeight.bold,
+          //       ),
+          //     ),
+          //     TextButton(
+          //       onPressed: () {},
+          //       child: Text(
+          //         'See all',
+          //         style: TextStyle(
+          //           fontSize: fontSize + 6,
+          //           color: AppColors.primary,
+          //           fontWeight: FontWeight.w600,
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          Responsive.vSpace(context, 10),
           BlocBuilder<ProductsBloc, ProductsState>(
             builder: (context, state) {
               if (state is ProductsLoading &&
@@ -662,9 +665,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     sold:
                         '${(product.reviewCount / 1000).toStringAsFixed(1)}k+',
                     name: product.name,
-                    currentPrice: 'Rs. ${product.price.toStringAsFixed(0)}',
+                    currentPrice: '₹${product.price.toStringAsFixed(0)}',
                     originalPrice: product.originalPrice != null
-                        ? 'Rs. ${product.originalPrice!.toStringAsFixed(0)}'
+                        ? '₹${product.originalPrice!.toStringAsFixed(0)}'
                         : '',
                     badge: product.hasDiscount
                         ? '${product.discountPercentage.toStringAsFixed(0)}% Off'
@@ -788,7 +791,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         ),
                         Responsive.vSpace(context, 8),
                         Text(
-                          'Rs. ${sponsoredProduct.price.toStringAsFixed(0)}',
+                          '₹${sponsoredProduct.price.toStringAsFixed(0)}',
                           style: TextStyle(
                             color: AppColors.primary,
                             fontSize: 18,
@@ -985,9 +988,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 rating: product.rating,
                 sold: '${(product.reviewCount / 1000).toStringAsFixed(1)}k+',
                 name: product.name,
-                currentPrice: 'Rs. ${product.price.toStringAsFixed(0)}',
+                currentPrice: '₹${product.price.toStringAsFixed(0)}',
                 originalPrice: product.originalPrice != null
-                    ? 'Rs. ${product.originalPrice!.toStringAsFixed(0)}'
+                    ? '₹${product.originalPrice!.toStringAsFixed(0)}'
                     : '',
                 badge: product.hasDiscount
                     ? '${product.discountPercentage.toStringAsFixed(0)}% Off'
@@ -1055,9 +1058,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 rating: product.rating,
                 sold: '${(product.reviewCount / 1000).toStringAsFixed(1)}k+',
                 name: product.name,
-                currentPrice: 'Rs. ${product.price.toStringAsFixed(0)}',
+                currentPrice: '₹${product.price.toStringAsFixed(0)}',
                 originalPrice: product.originalPrice != null
-                    ? 'Rs. ${product.originalPrice!.toStringAsFixed(0)}'
+                    ? '₹${product.originalPrice!.toStringAsFixed(0)}'
                     : '',
                 badge: product.hasDiscount
                     ? '${product.discountPercentage.toStringAsFixed(0)}% Off'

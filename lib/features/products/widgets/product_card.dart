@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../shared/components/optimized_image.dart';
 import '../../../core/services/image_optimization_service.dart';
 import '../models/product_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/components/skewed_badge.dart';
 import '../../../core/utils/responsive.dart';
+import '../../cart/bloc/cart_cubit.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -136,6 +138,27 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                   ),
+
+                  // Add to Cart Floating Button
+                  if ((product.inStock ?? true))
+                    Positioned(
+                      bottom: badgeTop,
+                      right: badgeLeft,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          minimumSize: const Size(0, 0),
+                        ),
+                        onPressed: () {
+                          context.read<CartCubit>().add(productId: product.id);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Added to cart')),
+                          );
+                        },
+                        icon: const Icon(Feather.shopping_cart, size: 14),
+                        label: const Text('Add'),
+                      ),
+                    ),
                 ],
               ),
             ),
