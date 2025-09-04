@@ -28,7 +28,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         child: Column(
           children: [
             // Top Navigation Bar
-            _buildTopNavigationBar(),
+            // _buildTopNavigationBar(),
 
             // Product Image Section
             _buildProductImageSection(),

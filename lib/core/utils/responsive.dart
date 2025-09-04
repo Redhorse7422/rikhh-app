@@ -175,27 +175,27 @@ class Responsive {
       case DeviceSize.xxSmall:
         return 0.55; // ultra tiny
       case DeviceSize.xSmall:
-        return 0.6;
+        return 0.60;
       case DeviceSize.small:
-        return 0.70;
+        return 0.65;
       case DeviceSize.semiMedium:
-        return 0.74;
+        return 0.65;
       case DeviceSize.medium:
-        return 0.78;
+        return 0.72;
       case DeviceSize.large:
-        return 0.8;
+        return 0.80;
       case DeviceSize.xLarge:
         return 0.82;
       case DeviceSize.tablet:
-        return 0.85;
+        return 0.84;
       case DeviceSize.desktopSmall:
-        return 0.87;
+        return 0.86;
       case DeviceSize.desktopMedium:
-        return 0.90;
+        return 0.88;
       case DeviceSize.desktopLarge:
-        return 0.91;
+        return 0.90;
       case DeviceSize.ultraWide:
-        return 0.94; // very wide → more space
+        return 0.92; // very wide → more space
     }
   }
 
@@ -211,7 +211,7 @@ class Responsive {
       case DeviceSize.semiMedium:
         return 6.0;
       case DeviceSize.medium:
-        return 8.0;
+        return 6.0;
       case DeviceSize.large:
         return 10.0;
       case DeviceSize.xLarge:
@@ -266,17 +266,17 @@ class Responsive {
   static double getProductCardImageHeight(BuildContext context) {
     switch (getDeviceSize(context)) {
       case DeviceSize.xxSmall:
-        return 100.0; // very tiny devices
+        return 50.0; // very tiny devices
       case DeviceSize.xSmall:
-        return 120.0;
+        return 50.0;
       case DeviceSize.small:
-        return 130.0;
+        return 60.0;
       case DeviceSize.semiMedium:
-        return 140.0;
+        return 100.0;
       case DeviceSize.medium:
-        return 145.0;
+        return 120.0;
       case DeviceSize.large:
-        return 160.0;
+        return 120.0;
       case DeviceSize.xLarge:
         return 180.0;
       case DeviceSize.tablet:

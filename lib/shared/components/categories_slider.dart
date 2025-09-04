@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:rikhh_app/core/theme/app_colors.dart';
 import 'package:rikhh_app/core/utils/responsive.dart';
+import 'package:rikhh_app/features/products/models/product_model.dart';
 
 class CategoriesSlider extends StatelessWidget {
-  final List<String> categories;
-  final Function(String)? onCategorySelected;
+  final List<ProductCategory> categories;
+  final Function(ProductCategory)? onCategorySelected;
   final int? selectedIndex;
 
   const CategoriesSlider({
@@ -17,51 +18,73 @@ class CategoriesSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fontSize = Responsive.getProductCardFontSize(context, baseSize: 12.0);
+
     return SizedBox(
-      height: 46,
+      height: 90, // bigger height for image + text
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final isSelected = selectedIndex != null
               ? index == selectedIndex
-              : index == 0;
-          return Container(
-            margin: const EdgeInsets.only(right: 8, bottom: 4),
-            child: ElevatedButton(
-              onPressed: () {
-                if (onCategorySelected != null) {
-                  onCategorySelected!(categories[index]);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.18)
-                    : Color(0xFFF9FAFB),
-                foregroundColor: isSelected
-                    ? AppColors.primary
-                    : Color(0XFF667085),
-                elevation: isSelected ? 0 : 1,
-                minimumSize: const Size(0, 26),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 4,
-                ),
-                textStyle: TextStyle(
-                  fontSize: fontSize + 6,
-                  fontWeight: FontWeight.w600,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  side: BorderSide(
-                    color: isSelected
-                        ? AppColors.primary
-                        : Color(0xFFEAECF0), // dynamic border color
-                    width: 1.5,
+              : index == -1;
+
+          return GestureDetector(
+            onTap: () {
+              if (onCategorySelected != null) {
+                onCategorySelected!(categories[index]);
+              }
+            },
+            child: Container(
+              width: 70, // fixed width per category
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              child: Column(
+                children: [
+                  Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.primary
+                            : const Color(0xFFEAECF0),
+                        width: 2,
+                      ),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 3,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.network(
+                        categories[index].image ?? '',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Icon(Icons.image, color: Colors.grey),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 6),
+                  Text(
+                    categories[index].name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.w500,
+                      color: isSelected
+                          ? AppColors.primary
+                          : const Color(0XFF667085),
+                    ),
+                  ),
+                ],
               ),
-              child: Text(categories[index]),
             ),
           );
         },

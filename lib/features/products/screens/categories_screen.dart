@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:rikhh_app/features/products/models/product_model.dart';
 import 'package:rikhh_app/shared/components/categories_slider.dart';
 import 'package:rikhh_app/shared/components/category_card.dart';
 import 'package:rikhh_app/shared/components/top_search_bar.dart';
@@ -54,7 +56,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
-                children: [CategoriesSlider(categories: _getCategoryNames())],
+                children: [
+                  CategoriesSlider(
+                    categories: _getCategoryries(),
+                    onCategorySelected: (category) {
+                      context.go('/main/search', extra: category.name);
+                    },
+                  ),
+                ],
               ),
             ),
 
@@ -69,12 +78,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 
-  List<String> _getCategoryNames() {
+  List<ProductCategory> _getCategoryries() {
     final state = context.read<CategoriesBloc>().state;
     if (state is CategoriesLoaded) {
-      return state.categories.map((cat) => cat.name).toList();
+      return state.categories;
     }
-    return ['All', 'Loading...'];
+    return [];
   }
 
   Widget _buildTopNavigationBar() {
@@ -219,7 +228,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 return CategoryCard(
                   name: category.name,
                   image: category.image ?? '',
-                  onTap: () => {},
+                  onTap: () => {
+                    context.go('/main/search', extra: category.name),
+                  },
                 );
               },
             ),

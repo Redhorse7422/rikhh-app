@@ -27,7 +27,7 @@ class _SearchScreenState extends State<SearchScreen> {
   String _currentQuery = '';
   List<String> _searchHistory = [];
   // String _selectedFilter = 'All';
-  String? _selectedCategory; // Track selected category
+  ProductCategory? _selectedCategory; // Track selected category
   String? _selectedCategoryId; // Track selected category ID
 
   // Pagination state
@@ -106,7 +106,7 @@ class _SearchScreenState extends State<SearchScreen> {
         if (categoryData.name.isNotEmpty) {
           // This is a category selection
           setState(() {
-            _selectedCategory = categoryData.name;
+            _selectedCategory = categoryData;
             _selectedCategoryId = categoryData.id;
             _currentQuery = '';
             _searchController.clear();
@@ -160,7 +160,7 @@ class _SearchScreenState extends State<SearchScreen> {
           if (categoryData.name.isNotEmpty) {
             // This is a category selection
             setState(() {
-              _selectedCategory = categoryData.name;
+              _selectedCategory = categoryData;
               _selectedCategoryId = categoryData.id;
               _currentQuery = '';
               _searchController.clear();
@@ -400,6 +400,12 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: TextField(
                   controller: _searchController,
                   focusNode: _searchFocusNode,
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : AppColors.heading,
+                  ),
+                  cursorColor: AppColors.primary,
                   decoration: InputDecoration(
                     // hintText: _selectedCategory != null
                     //     ? 'Search in $_selectedCategory...'
@@ -495,11 +501,12 @@ class _SearchScreenState extends State<SearchScreen> {
                   Icon(Feather.tag, size: 16, color: AppColors.primary),
                   const SizedBox(width: 6),
                   Text(
-                    'Category: $_selectedCategory',
+                    'Category: ${_selectedCategory?.name}',
                     style: TextStyle(
                       color: AppColors.primary,
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
+                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -512,25 +519,12 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           BlocBuilder<CategoriesBloc, CategoriesState>(
             builder: (context, state) {
-              List<String> categories = ['All'];
+              List<ProductCategory> categories = [];
 
               if (state is CategoriesLoaded) {
-                categories.addAll(
-                  state.categories.map((cat) => cat.name).toList(),
-                );
+                categories.addAll(state.categories);
               } else if (state is CategoriesLoading) {
-                categories.addAll(['Loading...', 'Loading...', 'Loading...']);
-              } else {
-                categories.addAll([
-                  'Clothing',
-                  'Electronics',
-                  'Home & Garden',
-                  'Beauty',
-                  'Sports',
-                  'Books',
-                  'Toys',
-                  'Automotive',
-                ]);
+                categories.addAll([]);
               }
 
               return CategoriesSlider(
@@ -541,27 +535,19 @@ class _SearchScreenState extends State<SearchScreen> {
                 onCategorySelected: (category) {
                   if (mounted) {
                     setState(() {
-                      if (category == 'All') {
-                        _selectedCategory = null;
-                        _selectedCategoryId = null;
-                        // Don't clear search text when clearing category
-                      } else {
-                        _selectedCategory = category;
-                        // Find the category ID from the loaded categories
-                        if (state is CategoriesLoaded) {
-                          final categoryData = state.categories.firstWhere(
-                            (cat) => cat.name == category,
-                            orElse: () => ProductCategory(
-                              id: '',
-                              name: category,
-                              productCount: 0,
-                              isActive: true,
-                            ),
-                          );
-                          _selectedCategoryId = categoryData.id;
-                        }
-                        // Don't change the search query text when selecting category
-                        // Keep the current search text and just apply category filter
+                      _selectedCategory = category;
+                      // Find the category ID from the loaded categories
+                      if (state is CategoriesLoaded) {
+                        final categoryData = state.categories.firstWhere(
+                          (cat) => cat.name == category.name,
+                          orElse: () => ProductCategory(
+                            id: category.id,
+                            name: category.name,
+                            productCount: 0,
+                            isActive: true,
+                          ),
+                        );
+                        _selectedCategoryId = categoryData.id;
                       }
                     });
                   }
@@ -637,8 +623,8 @@ class _SearchScreenState extends State<SearchScreen> {
                           Text(
                             _currentQuery.isNotEmpty &&
                                     _currentQuery.length >= 3
-                                ? 'in $_selectedCategory'
-                                : 'Category: $_selectedCategory',
+                                ? 'in ${_selectedCategory?.name}'
+                                : 'Category: ${_selectedCategory?.name}',
                             style: TextStyle(
                               color: AppColors.primary,
                               fontSize: 12,
@@ -691,10 +677,10 @@ class _SearchScreenState extends State<SearchScreen> {
             controller: _scrollController,
             padding: const EdgeInsets.all(16),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+              crossAxisCount: 3,
               childAspectRatio: _getResponsiveAspectRatio(context),
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
             ),
             itemCount: products.length + (_isLoadingMore ? 1 : 0),
             itemBuilder: (context, index) {

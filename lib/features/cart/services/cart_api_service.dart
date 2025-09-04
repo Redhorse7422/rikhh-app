@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import '../../../core/app_config.dart';
 import '../../../core/network/dio_client.dart';
 import '../models/cart_models.dart';
@@ -34,8 +36,27 @@ class CartApiService {
   }
 
   Future<List<CartItem>> getItems() async {
-    print('🔍 Cart API: Getting items with headers: ${_dio.options.headers}');
-    final response = await _dio.get('$_v1/cart/items');
+    // Get user ID from SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    final userStr = prefs.getString(AppConfig.userKey);
+    
+    if (userStr == null) {
+      throw Exception('User not logged in');
+    }
+    
+    final userData = jsonDecode(userStr) as Map<String, dynamic>;
+    print('User ===> $userData');
+    final userId = userData['id'] as String?;
+    
+    if (userId == null) {
+      throw Exception('User ID not found in stored user data');
+    }
+    
+    print('🔍 Cart API: Getting items for userId: $userId with headers: ${_dio.options.headers}');
+    final response = await _dio.get(
+      '$_v1/cart/items',
+      queryParameters: {'userId': userId},
+    );
     print('🔍 Cart API Response: ${response.data}');
     final data = (response.data is Map<String, dynamic>)
         ? response.data as Map<String, dynamic>

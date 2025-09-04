@@ -42,7 +42,7 @@ class TopSearchBar extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 14,
+                    vertical: 10,
                   ),
                   decoration: BoxDecoration(
                     color: const Color(0XFFF2F4F7),
@@ -50,11 +50,11 @@ class TopSearchBar extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(Feather.search, color: AppColors.body),
+                      Icon(Feather.search, color: AppColors.body, size: 18),
                       const SizedBox(width: 12),
                       Text(
                         hintText,
-                        style: TextStyle(color: AppColors.body, fontSize: 16),
+                        style: TextStyle(color: AppColors.body, fontSize: 14),
                       ),
                     ],
                   ),
@@ -71,62 +71,25 @@ class TopSearchBar extends StatelessWidget {
                   onSearch!();
                 }
               },
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : AppColors.heading,
+              ),
+              cursorColor: Theme.of(context).colorScheme.primary,
               decoration: InputDecoration(
                 hintText: hintText,
-                hintStyle: TextStyle(color: AppColors.body),
-                prefixIcon: Icon(Feather.search, color: AppColors.body),
-                // suffixIcon: Row(
-                //   mainAxisSize: MainAxisSize.min,
-                //   children: [
-                //     // Character count indicator when typing (if less than 3 chars)
-                //     if (controller?.text.isNotEmpty == true && controller!.text.length < 3)
-                //       Container(
-                //         margin: const EdgeInsets.only(right: 8),
-                //         padding: const EdgeInsets.symmetric(
-                //           horizontal: 8,
-                //           vertical: 4,
-                //         ),
-                //         decoration: BoxDecoration(
-                //           color: controller!.text.length == 2
-                //               ? AppColors.primary.withValues(alpha: 0.2)
-                //               : AppColors.body.withValues(alpha: 0.1),
-                //           borderRadius: BorderRadius.circular(12),
-                //         ),
-                //         child: Text(
-                //           '${controller!.text.length}/3',
-                //           style: TextStyle(
-                //             color: controller!.text.length == 2
-                //                 ? AppColors.primary
-                //                 : AppColors.body,
-                //             fontSize: 10,
-                //             fontWeight: FontWeight.w500,
-                //           ),
-                //         ),
-                //       ),
-                //     // Clear button when there's text
-                //     if (controller?.text.isNotEmpty == true)
-                //       IconButton(
-                //         onPressed: onClear,
-                //         icon: Icon(Feather.x, color: AppColors.body),
-                //         iconSize: 20,
-                //       ),
-                //     // Search button
-                //     if (onSearch != null)
-                //       IconButton(
-                //         onPressed: () {
-                //           if (controller?.text.trim().isNotEmpty == true) {
-                //             onSearch!();
-                //           }
-                //         },
-                //         icon: Icon(Feather.search, color: AppColors.primary),
-                //       ),
-                //   ],
-                // ),
+                hintStyle: TextStyle(color: AppColors.body, fontSize: 14),
+                prefixIcon: Icon(
+                  Feather.search,
+                  color: AppColors.body,
+                  size: 18,
+                ),
                 filled: true,
                 fillColor: Color(0XFFF2F4F7),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
-                  vertical: 14,
+                  vertical: 10,
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25),

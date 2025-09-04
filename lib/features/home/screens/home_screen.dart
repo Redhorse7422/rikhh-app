@@ -4,8 +4,10 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rikhh_app/features/products/data/sample_products.dart';
 import 'package:rikhh_app/shared/components/categories_slider.dart';
+import 'package:rikhh_app/shared/components/categories_slider_skeleton.dart';
 import 'package:rikhh_app/shared/components/product_card.dart';
 import 'package:rikhh_app/shared/components/promo_banner.dart';
+import 'package:rikhh_app/shared/components/featured_products_section.dart';
 import 'package:rikhh_app/shared/components/top_search_bar.dart';
 import 'package:rikhh_app/core/utils/responsive.dart';
 import '../../../core/theme/app_colors.dart';
@@ -233,8 +235,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     // Categories Section
                     _buildCategoriesSection(),
 
-                    // Featured Products
-                    _buildFeaturedProducts(),
+                    // Featured Products (Redesigned)
+                    const FeaturedProductsSection(),
 
                     // Sponsored Product
                     _buildSponsoredProduct(),
@@ -274,15 +276,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     return Container(
       color: AppColors.white,
       padding: EdgeInsets.fromLTRB(
-        Responsive.scaleWidth(context, 16),
-        MediaQuery.of(context).padding.top + Responsive.scaleHeight(context, 0),
-        Responsive.scaleWidth(context, 16),
+        Responsive.scaleWidth(context, 12),
+        Responsive.scaleWidth(context, 8),
+        Responsive.scaleWidth(context, 12),
         Responsive.scaleHeight(context, 8),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Responsive.vSpace(context, 8),
+          // Responsive.vSpace(context, 8),
 
           // Top row with Location, Wallet, and Notification
           Row(
@@ -443,252 +445,32 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late final List<PromoBanner> _promoBanners;
 
   Widget _buildCategoriesSection() {
-    final fontSize = Responsive.getProductCardFontSize(context, baseSize: 12.0);
     return BlocBuilder<CategoriesBloc, CategoriesState>(
       builder: (context, state) {
-        List<String> categories = ['All'];
+        List<ProductCategory> categories = [];
 
-        if (state is CategoriesLoaded) {
-          categories.addAll(state.categories.map((cat) => cat.name).toList());
-        } else if (state is CategoriesLoading) {
-          categories.addAll(['Loading...', 'Loading...', 'Loading...']);
-        } else {
-          categories.addAll([
-            'Clothing',
-            'Shoes',
-            'Bags',
-            'Electronics',
-            'Kitchen',
-            'Beauty',
-            'Sports',
-            'Home',
-            'Books',
-            'Toys',
-            'Automotive',
-            'Health',
-            'Garden',
-            'Office',
-            'Pet Supplies',
-          ]);
+        if (state is CategoriesLoading) {
+          return const CategoriesSliderSkeleton();
+        } else if (state is CategoriesLoaded) {
+          categories.addAll(state.categories);
+
+          return Container(
+            margin: EdgeInsets.fromLTRB(
+              Responsive.scaleWidth(context, 0),
+              0,
+              Responsive.scaleWidth(context, 6),
+              Responsive.scaleHeight(context, 8),
+            ),
+            child: CategoriesSlider(
+              categories: categories,
+              onCategorySelected: (category) {
+                context.go('/main/search', extra: category.name);
+              },
+            ),
+          );
         }
-
-        return Container(
-          margin: EdgeInsets.fromLTRB(
-            Responsive.scaleWidth(context, 16),
-            0,
-            Responsive.scaleWidth(context, 16),
-            Responsive.scaleHeight(context, 8),
-          ),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Categories',
-                    style: TextStyle(
-                      color: AppColors.heading,
-                      fontSize: fontSize + 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      // Navigate to categories screen
-                      Navigator.of(context).pushNamed('/categories');
-                    },
-                    child: Text(
-                      'See all',
-                      style: TextStyle(
-                        fontSize: fontSize + 6,
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Responsive.vSpace(context, 5),
-              CategoriesSlider(
-                categories: categories,
-                onCategorySelected: (category) {
-                  // Navigate to search screen with selected category
-                  if (category != 'All') {
-                    context.go('/main/search', extra: category);
-                  }
-                },
-              ),
-            ],
-          ),
-        );
+        return const SizedBox.shrink();
       },
-    );
-  }
-
-  Widget _buildFeaturedProducts() {
-    return Container(
-      margin: EdgeInsets.fromLTRB(
-        Responsive.scaleWidth(context, 16),
-        Responsive.scaleHeight(context, 8),
-        Responsive.scaleWidth(context, 16),
-        Responsive.scaleHeight(context, 16),
-      ),
-      child: Column(
-        children: [
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //   children: [
-          //     Text(
-          //       'Featured Products',
-          //       style: TextStyle(
-          //         color: AppColors.heading,
-          //         fontSize: fontSize + 11,
-          //         fontWeight: FontWeight.bold,
-          //       ),
-          //     ),
-          //     TextButton(
-          //       onPressed: () {},
-          //       child: Text(
-          //         'See all',
-          //         style: TextStyle(
-          //           fontSize: fontSize + 6,
-          //           color: AppColors.primary,
-          //           fontWeight: FontWeight.w600,
-          //         ),
-          //       ),
-          //     ),
-          //   ],
-          // ),
-          Responsive.vSpace(context, 10),
-          BlocBuilder<ProductsBloc, ProductsState>(
-            builder: (context, state) {
-              if (state is ProductsLoading &&
-                  !context.read<ProductsBloc>().isFeaturedProductsLoaded) {
-                return Center(
-                  child: Padding(
-                    padding: Responsive.padding(context, all: 32.0),
-                    child: const CircularProgressIndicator(
-                      color: AppColors.primary,
-                    ),
-                  ),
-                );
-              }
-
-              if (state is ProductsError &&
-                  !context.read<ProductsBloc>().isFeaturedProductsLoaded) {
-                return Center(
-                  child: Padding(
-                    padding: Responsive.padding(context, all: 32.0),
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          color: AppColors.body,
-                          size: 48,
-                        ),
-                        Responsive.vSpace(context, 16),
-                        Text(
-                          'Error loading featured products',
-                          style: TextStyle(color: AppColors.body),
-                        ),
-                        Responsive.vSpace(context, 8),
-                        Text(
-                          state.message,
-                          style: TextStyle(color: AppColors.body, fontSize: 12),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              List<Product> featuredProducts = [];
-
-              // Handle different states for featured products
-              if (state is FeaturedProductsLoaded) {
-                featuredProducts = state.featuredProducts;
-              } else if (state is ProductsLoaded &&
-                  state.currentFilter?.featured == true) {
-                featuredProducts = state.products;
-              } else if (state is SearchProductsLoaded) {
-                // If we're in search state, use cached featured products
-                featuredProducts = context
-                    .read<ProductsBloc>()
-                    .getFeaturedProducts();
-              } else {
-                // Fallback to cached featured products
-                featuredProducts = context
-                    .read<ProductsBloc>()
-                    .getFeaturedProducts();
-              }
-
-              if (featuredProducts.isEmpty) {
-                return Center(
-                  child: Padding(
-                    padding: Responsive.padding(context, all: 32.0),
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.inventory_2_outlined,
-                          color: AppColors.body,
-                          size: 48,
-                        ),
-                        Responsive.vSpace(context, 16),
-                        Text(
-                          'No featured products available',
-                          style: TextStyle(color: AppColors.body),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              return GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: _getResponsiveAspectRatio(context),
-                  crossAxisSpacing: Responsive.scaleWidth(context, 16),
-                  mainAxisSpacing: Responsive.scaleHeight(context, 9),
-                ),
-                itemCount: featuredProducts.length,
-                itemBuilder: (context, index) {
-                  final product = featuredProducts[index];
-                  return ProductCard(
-                    thumbnail: product.thumbnailImg != null
-                        ? product.thumbnailImg!.url
-                        : 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
-                    rating: product.rating,
-                    sold:
-                        '${(product.reviewCount / 1000).toStringAsFixed(1)}k+',
-                    name: product.name,
-                    currentPrice: '₹${product.price.toStringAsFixed(0)}',
-                    originalPrice: product.originalPrice != null
-                        ? '₹${product.originalPrice!.toStringAsFixed(0)}'
-                        : '',
-                    badge: product.hasDiscount
-                        ? '${product.discountPercentage.toStringAsFixed(0)}% Off'
-                        : null,
-                    badgeColor: product.hasDiscount ? Colors.red : null,
-                    onTap: () {
-                      // Navigate to product detail screen
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ProductDetailScreen(product: product),
-                        ),
-                      );
-                    },
-                  );
-                },
-              );
-            },
-          ),
-        ],
-      ),
     );
   }
 
@@ -700,9 +482,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     return Container(
       margin: EdgeInsets.fromLTRB(
-        Responsive.scaleWidth(context, 16),
+        Responsive.scaleWidth(context, 12),
         Responsive.scaleHeight(context, 8),
-        Responsive.scaleWidth(context, 16),
+        Responsive.scaleWidth(context, 12),
         Responsive.scaleHeight(context, 8),
       ),
       child: Column(
@@ -813,10 +595,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget _buildRecentlyViewed() {
     return Container(
       margin: EdgeInsets.fromLTRB(
-        Responsive.scaleWidth(context, 16),
+        Responsive.scaleWidth(context, 12),
         Responsive.scaleHeight(context, 8),
-        Responsive.scaleWidth(context, 16),
-        Responsive.scaleHeight(context, 16),
+        Responsive.scaleWidth(context, 12),
+        Responsive.scaleHeight(context, 8),
       ),
       child: Column(
         children: [
@@ -892,10 +674,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget _buildTopPicks() {
     return Container(
       margin: EdgeInsets.fromLTRB(
-        Responsive.scaleWidth(context, 16),
+        Responsive.scaleWidth(context, 12),
         Responsive.scaleHeight(context, 8),
-        Responsive.scaleWidth(context, 16),
-        Responsive.scaleHeight(context, 16),
+        Responsive.scaleWidth(context, 12),
+        Responsive.scaleHeight(context, 12),
       ),
       child: Column(
         children: [
@@ -938,10 +720,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     return Container(
       margin: EdgeInsets.fromLTRB(
-        Responsive.scaleWidth(context, 16),
+        Responsive.scaleWidth(context, 12),
         Responsive.scaleHeight(context, 8),
-        Responsive.scaleWidth(context, 16),
-        Responsive.scaleHeight(context, 16),
+        Responsive.scaleWidth(context, 12),
+        Responsive.scaleHeight(context, 12),
       ),
       child: Column(
         children: [
@@ -1023,10 +805,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     return Container(
       margin: EdgeInsets.fromLTRB(
-        Responsive.scaleWidth(context, 16),
+        Responsive.scaleWidth(context, 12),
         Responsive.scaleHeight(context, 8),
-        Responsive.scaleWidth(context, 16),
-        Responsive.scaleHeight(context, 16),
+        Responsive.scaleWidth(context, 12),
+        Responsive.scaleHeight(context, 12),
       ),
       child: Column(
         children: [

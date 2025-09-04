@@ -34,8 +34,8 @@ class PromoBannerWidget extends StatelessWidget {
     super.key,
     required this.banner,
     this.onButtonPressed,
-    this.height = 160,
-    this.imageSize = 149,
+    this.height = 140,
+    this.imageSize = 120,
     this.margin = const EdgeInsets.only(right: 16),
   });
 
@@ -50,10 +50,10 @@ class PromoBannerWidget extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(14),
         child: Row(
           children: [
             Expanded(
@@ -62,13 +62,13 @@ class PromoBannerWidget extends StatelessWidget {
                 children: [
                   Text(
                     banner.topTitle,
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    style: const TextStyle(color: Colors.white, fontSize: 10),
                   ),
                   Text(
                     banner.title,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -77,12 +77,12 @@ class PromoBannerWidget extends StatelessWidget {
                     banner.subtitle,
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: onButtonPressed ?? () {},
                     style: ElevatedButton.styleFrom(
@@ -91,9 +91,9 @@ class PromoBannerWidget extends StatelessWidget {
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
-                        vertical: 8,
+                        vertical: 4,
                       ),
-                      minimumSize: const Size(0, 32),
+                      minimumSize: const Size(0, 26),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -106,12 +106,12 @@ class PromoBannerWidget extends StatelessWidget {
             const SizedBox(width: 20),
 
             Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.all(14),
                 child: Image.asset(
                   banner.imagePath,
                   height: double.infinity,
-                  fit: BoxFit.cover, // fill available space proportionally
+                  fit: BoxFit.contain, // fill available space proportionally
                   errorBuilder: (context, error, stackTrace) {
                     return Center(
                       child: Icon(
@@ -144,9 +144,9 @@ class PromoBannerCarousel extends StatefulWidget {
     super.key,
     required this.banners,
     this.onButtonPressed,
-    this.height = 200,
-    this.imageSize = 80,
-    this.viewportFraction = 0.85,
+    this.height = 150,
+    this.imageSize = 60,
+    this.viewportFraction = 1,
     this.autoPlay = false,
     this.autoPlayInterval = const Duration(seconds: 5),
   });
@@ -216,7 +216,7 @@ class _PromoBannerCarouselState extends State<PromoBannerCarousel> {
     }
 
     return Container(
-      margin: const EdgeInsets.only(top: 16, bottom: 16),
+      margin: const EdgeInsets.only(top: 10, bottom: 10),
       child: Column(
         children: [
           SizedBox(
@@ -224,6 +224,7 @@ class _PromoBannerCarouselState extends State<PromoBannerCarousel> {
             child: PageView.builder(
               itemCount: widget.banners.length,
               controller: _pageController,
+              padEnds: false,
               onPageChanged: (index) {
                 setState(() {
                   _currentPage = index;
@@ -236,6 +237,7 @@ class _PromoBannerCarouselState extends State<PromoBannerCarousel> {
                   onButtonPressed: widget.onButtonPressed,
                   height: widget.height,
                   imageSize: widget.imageSize,
+                  margin: EdgeInsets.only(left: 16, right: 16),
                 );
               },
             ),

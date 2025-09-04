@@ -33,106 +33,76 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get responsive dimensions using the utility class
-    final imageHeight = Responsive.getProductCardImageHeight(context);
     final padding = Responsive.getProductCardPadding(context);
-    final fontSize = Responsive.getProductCardFontSize(context, baseSize: 12.0);
-    // final priceFontSize = Responsive.getProductCardFontSize(
-    //   context,
-    //   baseSize: 16.0,
-    // );
 
     return GestureDetector(
       onTap: onTap,
-      child: SizedBox(
-        // decoration: BoxDecoration(
-        //   color: AppColors.white,
-        //   borderRadius: BorderRadius.circular(12),
-        //   border: Border.all(color: AppColors.divider),
-        //   boxShadow: [
-        //     BoxShadow(
-        //       color: Colors.black.withValues(alpha: 0.05),
-        //       blurRadius: 8,
-        //       offset: const Offset(0, 4),
-        //     ),
-        //   ],
-        // ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
           children: [
-            // Product Image Container with responsive height and badge overlay
-            Stack(
-              children: [
-                Container(
-                  height: imageHeight,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: AppColors.divider,
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
-                    child: thumbnail.startsWith('http')
-                        ? OptimizedImage(
-                            imageUrl: thumbnail,
-                            fit: BoxFit.cover,
-                            size: ImageSize.thumbnail,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(12),
-                              topRight: Radius.circular(12),
-                            ),
-                          )
-                        : Image.asset(
-                            thumbnail,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Center(
-                                  child: Icon(
-                                    Feather.image,
-                                    color: AppColors.body,
-                                    size: 40,
-                                  ),
-                                ),
-                          ),
-                  ),
-                ),
-
-                // Badge positioned over image
-                if (badge != null)
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    child: SkewedBadge(
-                      text: badge!,
-                      color: badgeColor ?? Colors.red,
-                    ),
-                  ),
-              ],
-            ),
-
-            // Product Details with responsive padding and spacing
+            // Product Image
             Expanded(
-              child: Container(
-                padding: EdgeInsets.all(padding),
+              flex: 6,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  topRight: Radius.circular(8),
+                ),
+                child: thumbnail.startsWith('http')
+                    ? OptimizedImage(
+                        imageUrl: thumbnail,
+                        fit: BoxFit.cover,
+                        size: ImageSize.thumbnail,
+                        width: double.infinity,
+                      )
+                    : Image.asset(
+                        thumbnail,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Center(
+                          child: Icon(
+                            Feather.image,
+                            color: AppColors.body,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+              ),
+            ),
+            // Product Details
+            Expanded(
+              flex: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Rating and Sold Count Row
                     Row(
                       children: [
                         Icon(
                           Feather.star,
                           color: const Color(0XFFFB6515),
-                          size: fontSize + 4,
+                          size: 8,
                         ),
                         SizedBox(width: padding * 0.5),
                         Text(
                           rating.toString(),
                           style: TextStyle(
                             color: AppColors.heading,
-                            fontSize: fontSize,
+                            fontSize: 9,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -142,7 +112,7 @@ class ProductCard extends StatelessWidget {
                             '$sold Sold',
                             style: TextStyle(
                               color: AppColors.body,
-                              fontSize: fontSize,
+                              fontSize: 9,
                               fontWeight: FontWeight.w500,
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -150,49 +120,23 @@ class ProductCard extends StatelessWidget {
                         ),
                       ],
                     ),
-
-                    // SizedBox(height: padding * 0.75),
-
-                    // Product Name
                     Text(
                       toCamelCase(name),
                       style: TextStyle(
+                        fontWeight: FontWeight.w500,
                         color: AppColors.black,
-                        fontSize: fontSize + 6,
-                        fontWeight: FontWeight.w600,
-                        // height: 1.2,
+                        fontSize: 12,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-
-                    const Spacer(),
-
-                    // Price Row with responsive layout
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          currentPrice,
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontSize: fontSize + 6,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        if (originalPrice.isNotEmpty) ...[
-                          SizedBox(height: 2),
-                          Text(
-                            originalPrice,
-                            style: TextStyle(
-                              color: AppColors.body,
-                              fontSize: fontSize,
-                              decoration: TextDecoration.lineThrough,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ],
+                    Text(
+                      currentPrice,
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
