@@ -149,11 +149,17 @@ class ProductCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           minimumSize: const Size(0, 0),
                         ),
-                        onPressed: () {
-                          context.read<CartCubit>().add(productId: product.id);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Added to cart')),
-                          );
+                        onPressed: () async {
+                          try {
+                            // await context.read<CartCubit>().add(productId: product.id);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Added to cart')),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Failed to add to cart: $e')),
+                            );
+                          }
                         },
                         icon: const Icon(Feather.shopping_cart, size: 14),
                         label: const Text('Add'),

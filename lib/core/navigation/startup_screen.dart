@@ -32,6 +32,10 @@ class _StartupScreenState extends State<StartupScreen> {
     // Configure Dio with token if present
     DioClient.updateAuthToken(token);
     print('🔍 StartupScreen: DioClient configured with token');
+    
+    // Verify token is properly set in DioClient
+    final currentToken = DioClient.getCurrentToken();
+    print('🔍 StartupScreen: DioClient current token: ${currentToken != null ? 'Yes (${currentToken.length} chars)' : 'No'}');
 
     // Check authentication status
     if (mounted) {

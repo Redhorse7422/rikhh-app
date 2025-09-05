@@ -19,37 +19,42 @@ class _MainAuthScreenState extends State<MainAuthScreen> {
         children: [
           // Background Image
           Positioned.fill(
-            top: -80,
+            top: -65,
             child: Image.asset('assets/images/auth_bg.png', fit: BoxFit.cover),
           ),
 
           // White blurry overlay - TOP
+          // White blurry overlay - BOTTOM
           Positioned(
-            top: 0,
+            bottom: 0,
             left: 0,
             right: 0,
             height: 140,
             child: ClipRect(
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
                       colors: [
-                        Colors.white.withValues(alpha: 0.85),
-                        Colors.white.withValues(alpha: 0.55),
-                        Colors.white.withValues(alpha: 0.2),
-                        Colors.white.withValues(alpha: 0.0),
+                        Colors.white.withValues(
+                          alpha: 0.8,
+                        ), // Almost solid at bottom
+                        Colors.white.withValues(alpha: .5), // Mid fade
+                        Colors.white.withValues(alpha: 0.5), // Lightly visible
+                        Colors.white.withValues(
+                          alpha: 0.5,
+                        ), // Fully transparent at top
                       ],
+                      stops: const [0.0, 0.3, 0.7, 1.0],
                     ),
                   ),
                 ),
               ),
             ),
           ),
-
           // White blurry overlay - BOTTOM
           Positioned(
             left: 0,

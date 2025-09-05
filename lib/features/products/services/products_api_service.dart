@@ -5,7 +5,7 @@ import '../models/product_model.dart';
 
 part 'products_api_service.g.dart';
 
-@RestApi(baseUrl: "")
+@RestApi(baseUrl: "172.28.96.1")
 abstract class ProductsApiService {
   factory ProductsApiService(Dio dio, {String? baseUrl}) = _ProductsApiService;
 

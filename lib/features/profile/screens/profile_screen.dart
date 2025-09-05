@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../features/auth/bloc/auth_bloc.dart';
-import '../../../core/navigation/startup_screen.dart';
+import '../../../core/routes/app_router.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -13,11 +14,8 @@ class ProfileScreen extends StatelessWidget {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthUnauthenticated) {
-          // Navigate to startup screen after logout
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const StartupScreen()),
-            (route) => false,
-          );
+          // Navigate to startup screen after logout using GoRouter
+          context.go(AppRouter.startup);
         }
       },
       child: Scaffold(

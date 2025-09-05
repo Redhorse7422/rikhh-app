@@ -12,8 +12,8 @@ class CartState extends Equatable {
   const CartState({
     required this.status,
     required this.items,
-    required this.summary,
-    required this.errorMessage,
+    this.summary,
+    this.errorMessage,
     required this.actionInProgress,
   });
 

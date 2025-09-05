@@ -53,9 +53,19 @@ class DioClient {
   static void updateAuthToken(String? token) {
     if (token != null) {
       _instance?.options.headers['Authorization'] = 'Bearer $token';
+      print('🔍 DioClient: Authorization header set with token (${token.length} chars)');
     } else {
       _instance?.options.headers.remove('Authorization');
+      print('🔍 DioClient: Authorization header removed');
     }
+  }
+
+  static String? getCurrentToken() {
+    final authHeader = _instance?.options.headers['Authorization'] as String?;
+    if (authHeader != null && authHeader.startsWith('Bearer ')) {
+      return authHeader.substring(7); // Remove 'Bearer ' prefix
+    }
+    return null;
   }
 }
 

@@ -20,10 +20,16 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
+  List<Widget> get _screens => [
     const HomeScreen(),
     const CategoriesScreen(),
-    const CartScreen(),
+    CartScreen(
+      onBackPressed: () {
+        setState(() {
+          _currentIndex = 0; // Go back to home
+        });
+      },
+    ),
     const OrdersScreen(),
     const ProfileScreen(),
   ];
@@ -37,7 +43,7 @@ class _MainNavigationState extends State<MainNavigation> {
       final authState = context.read<AuthBloc>().state;
       if (authState is AuthAuthenticated) {
         print('🔍 MainNavigation: User is authenticated, loading cart...');
-        context.read<CartCubit>().load();
+        context.read<CartCubit>().load(authState.user);
       } else {
         print('🔍 MainNavigation: User is not authenticated, skipping cart load');
       }
@@ -52,16 +58,17 @@ class _MainNavigationState extends State<MainNavigation> {
         // Load cart when user becomes authenticated
         if (state is AuthAuthenticated) {
           print('🔍 MainNavigation: User authenticated, loading cart...');
-          context.read<CartCubit>().load();
+          context.read<CartCubit>().load(state.user);
         } else if (state is AuthUnauthenticated) {
           print('🔍 MainNavigation: User unauthenticated, clearing cart...');
-          // Clear cart when user logs out
-          context.read<CartCubit>().clear();
+          // Clear cart when user logs out - just reset to initial state
+          // We can't call clear() without user data, so just reset the state
+          context.read<CartCubit>().reset();
         }
       },
       child: Scaffold(
         body: IndexedStack(index: _currentIndex, children: _screens),
-        bottomNavigationBar: _buildBottomNavigation(),
+        bottomNavigationBar: _currentIndex == 2 ? null : _buildBottomNavigation(), // Hide bottom nav on cart screen
       ),
     );
   }
@@ -110,7 +117,9 @@ class _MainNavigationState extends State<MainNavigation> {
           BottomNavigationBarItem(
             icon: BlocBuilder<CartCubit, CartState>(
               builder: (context, state) {
-                final itemCount = state.summary?.itemsCount ?? 0;
+                // Use summary itemsCount if available, otherwise calculate from items
+                final itemCount = state.summary?.itemsCount ?? 
+                    state.items.fold<int>(0, (sum, item) => sum + item.quantity);
                 return Stack(
                   children: [
                     const Icon(Feather.shopping_bag),

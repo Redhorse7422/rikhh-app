@@ -4,11 +4,11 @@ class AppConfig {
   static const String appVersion = '1.0.0';
 
   // Environment Configuration
-  static const bool isDevelopment = false; // Set to false for production
+  static const bool isDevelopment = true; // Set to false for production
   // If true, prefer using LAN IP for development (for physical devices)
-  static const bool useLanIpInDev = false;
+  static const bool useLanIpInDev = true;
   // Replace with your machine's LAN IP when useLanIpInDev is true
-  static const String devLanIp = '172.23.48.1';
+  static const String devLanIp = '172.28.96.1';
 
   // API Configuration
   static String get baseUrl {

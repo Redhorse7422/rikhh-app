@@ -106,7 +106,9 @@ class AppRouter {
       GoRoute(
         path: cart,
         name: 'cart',
-        builder: (context, state) => const CartScreen(),
+        builder: (context, state) => CartScreen(
+          onBackPressed: () => context.go('/main'),
+        ),
       ),
       
       GoRoute(
