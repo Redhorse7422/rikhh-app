@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rikhh_app/core/theme/app_colors.dart';
 import 'package:rikhh_app/features/checkout/bloc/checkout_state.dart';
 import '../../../shared/components/checkout_scaffold.dart';
 import '../../../shared/components/optimized_image.dart';
@@ -40,13 +41,15 @@ class _CheckoutReviewScreenState extends State<CheckoutReviewScreen> {
           session.items.isNotEmpty) {
         context.read<CheckoutCubit>().recalculateSummary();
       }
-      
+
       // Check if any items are missing images and fetch from cart
-      final hasMissingImages = session.items.any((item) => 
-          item.imageUrl == null || 
-          item.imageUrl!.isEmpty || 
-          item.imageUrl!.contains('unsplash.com'));
-      
+      final hasMissingImages = session.items.any(
+        (item) =>
+            item.imageUrl == null ||
+            item.imageUrl!.isEmpty ||
+            item.imageUrl!.contains('unsplash.com'),
+      );
+
       if (hasMissingImages) {
         context.read<CheckoutCubit>().fetchImagesFromCart(widget.userData);
       }
@@ -94,7 +97,6 @@ class _CheckoutReviewScreenState extends State<CheckoutReviewScreen> {
         },
         builder: (context, state) {
           final session = state.checkoutSession ?? widget.checkoutSession;
-
 
           // Show loading indicator for operations in progress
           if (state.isOperationInProgress) {
@@ -303,9 +305,10 @@ class _CheckoutReviewScreenState extends State<CheckoutReviewScreen> {
           children: [
             Text(
               'Delivery Information',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.heading,
+              ),
             ),
             const SizedBox(height: 12),
             Container(
@@ -317,10 +320,7 @@ class _CheckoutReviewScreenState extends State<CheckoutReviewScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.local_shipping,
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  Icon(Icons.local_shipping, color: AppColors.primary),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -328,7 +328,10 @@ class _CheckoutReviewScreenState extends State<CheckoutReviewScreen> {
                       children: [
                         Text(
                           'Standard Delivery',
-                          style: const TextStyle(fontWeight: FontWeight.w500),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.heading,
+                          ),
                         ),
                         // Text(
                         //   'Free delivery',
@@ -355,9 +358,10 @@ class _CheckoutReviewScreenState extends State<CheckoutReviewScreen> {
           children: [
             Text(
               'Coupon Code',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.heading,
+              ),
             ),
             const SizedBox(height: 12),
             if (session.couponCode != null) ...[
@@ -420,9 +424,10 @@ class _CheckoutReviewScreenState extends State<CheckoutReviewScreen> {
           children: [
             Text(
               'Order Summary',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.heading,
+              ),
             ),
             const SizedBox(height: 16),
             _buildSummaryRow('Subtotal', session.summary.subtotal),
@@ -456,17 +461,21 @@ class _CheckoutReviewScreenState extends State<CheckoutReviewScreen> {
           Text(
             label,
             style: isTotal
-                ? Theme.of(
-                    context,
-                  ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)
-                : null,
+                ? Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.heading,
+                  )
+                : Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.heading,
+                  ),
           ),
           Text(
             '${isDiscount ? '-' : ''}\$${amount.toStringAsFixed(2)}',
             style: isTotal
                 ? Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
+                    color: AppColors.primary,
                   )
                 : isDiscount
                 ? const TextStyle(color: Colors.green)
@@ -486,9 +495,10 @@ class _CheckoutReviewScreenState extends State<CheckoutReviewScreen> {
           children: [
             Text(
               'Payment Method',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.heading,
+              ),
             ),
             const SizedBox(height: 12),
             Container(
@@ -500,7 +510,7 @@ class _CheckoutReviewScreenState extends State<CheckoutReviewScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.money, color: Theme.of(context).primaryColor),
+                  Icon(Icons.money, color: AppColors.primary),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -508,7 +518,10 @@ class _CheckoutReviewScreenState extends State<CheckoutReviewScreen> {
                       children: [
                         Text(
                           'Cash on Delivery',
-                          style: const TextStyle(fontWeight: FontWeight.w500),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.heading,
+                          ),
                         ),
                         Text(
                           'Pay when your order arrives',
@@ -571,7 +584,6 @@ class _OrderItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(

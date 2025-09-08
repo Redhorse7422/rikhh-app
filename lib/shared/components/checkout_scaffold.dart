@@ -25,7 +25,7 @@ class CheckoutScaffold extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
         leading: showBackButton
             ? IconButton(
@@ -80,15 +80,20 @@ class CheckoutScaffold extends StatelessWidget {
           BottomNavigationBarItem(
             icon: BlocConsumer<CartCubit, CartState>(
               listener: (context, state) {
-                AppLogger.checkout('🛒 CheckoutScaffold: Cart state changed - status: ${state.status}, itemCount: ${state.summary?.itemsCount ?? state.items.fold<int>(0, (sum, item) => sum + item.quantity)}');
+                AppLogger.checkout(
+                  '🛒 CheckoutScaffold: Cart state changed - status: ${state.status}, itemCount: ${state.summary?.itemsCount ?? state.items.fold<int>(0, (sum, item) => sum + item.quantity)}',
+                );
               },
               builder: (context, state) {
-                final itemCount = state.summary?.itemsCount ??
+                final itemCount =
+                    state.summary?.itemsCount ??
                     state.items.fold<int>(
                       0,
                       (sum, item) => sum + item.quantity,
                     );
-                AppLogger.checkout('🛒 CheckoutScaffold: BlocBuilder rebuilding - itemCount: $itemCount, status: ${state.status}');
+                AppLogger.checkout(
+                  '🛒 CheckoutScaffold: BlocBuilder rebuilding - itemCount: $itemCount, status: ${state.status}',
+                );
                 return Stack(
                   children: [
                     const Icon(Feather.shopping_bag),

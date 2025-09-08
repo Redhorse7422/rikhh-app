@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rikhh_app/core/theme/app_colors.dart';
 import 'package:rikhh_app/features/checkout/bloc/checkout_state.dart';
 import '../../../shared/components/checkout_scaffold.dart';
 import '../bloc/checkout_cubit.dart';
@@ -173,7 +174,7 @@ class _CheckoutPaymentScreenState extends State<CheckoutPaymentScreen> {
             style: isTotal
                 ? Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
+                    color: AppColors.primary,
                   )
                 : isDiscount
                 ? const TextStyle(color: Colors.green)
@@ -207,10 +208,7 @@ class _CheckoutPaymentScreenState extends State<CheckoutPaymentScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    _getPaymentMethodIcon(),
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  Icon(_getPaymentMethodIcon(), color: AppColors.primary),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(

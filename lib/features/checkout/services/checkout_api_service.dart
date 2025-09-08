@@ -8,7 +8,6 @@ class CheckoutApiService {
 
   String get _v1 => '/${AppConfig.apiVersion}';
 
-
   /// Phase 1: Address Management
 
   /// Get user addresses
@@ -184,8 +183,7 @@ class CheckoutApiService {
       }
     } catch (e) {
       if (e is DioException) {
-        if (e.response != null) {
-        }
+        if (e.response != null) {}
       }
       rethrow;
     }
@@ -232,8 +230,7 @@ class CheckoutApiService {
       }
     } catch (e) {
       if (e is DioException) {
-        if (e.response != null) {
-        }
+        if (e.response != null) {}
       }
       rethrow;
     }
@@ -264,8 +261,7 @@ class CheckoutApiService {
       }
     } catch (e) {
       if (e is DioException) {
-        if (e.response != null) {
-        }
+        if (e.response != null) {}
       }
       rethrow;
     }
@@ -314,8 +310,7 @@ class CheckoutApiService {
       }
     } catch (e) {
       if (e is DioException) {
-        if (e.response != null) {
-        }
+        if (e.response != null) {}
       }
       rethrow;
     }
@@ -349,8 +344,7 @@ class CheckoutApiService {
       }
     } catch (e) {
       if (e is DioException) {
-        if (e.response != null) {
-        }
+        if (e.response != null) {}
       }
       rethrow;
     }
@@ -383,8 +377,7 @@ class CheckoutApiService {
       }
     } catch (e) {
       if (e is DioException) {
-        if (e.response != null) {
-        }
+        if (e.response != null) {}
       }
       rethrow;
     }

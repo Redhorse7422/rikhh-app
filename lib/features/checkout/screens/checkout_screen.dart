@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rikhh_app/core/theme/app_colors.dart';
 import 'package:rikhh_app/features/checkout/bloc/checkout_state.dart';
 import '../../../shared/components/checkout_scaffold.dart';
 import '../bloc/checkout_cubit.dart';
@@ -25,7 +26,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   void initState() {
     super.initState();
-    AppLogger.checkout('🏠 CheckoutScreen: Initializing with user data: ${widget.userData}');
+    AppLogger.checkout(
+      '🏠 CheckoutScreen: Initializing with user data: ${widget.userData}',
+    );
     // Load default addresses
     context.read<CheckoutCubit>().loadDefaultAddresses(widget.userData);
   }
@@ -36,24 +39,34 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       title: 'Checkout',
       body: BlocConsumer<CheckoutCubit, CheckoutState>(
         listener: (context, state) {
-          AppLogger.checkout('🏠 CheckoutScreen: State changed - Status: ${state.status}');
-          
+          AppLogger.checkout(
+            '🏠 CheckoutScreen: State changed - Status: ${state.status}',
+          );
+
           if (state.status == CheckoutStatus.addressLoaded &&
               state.defaultAddresses != null) {
             AppLogger.checkout('🏠 CheckoutScreen: Setting default addresses');
-            AppLogger.checkout('  - Shipping address: ${state.defaultAddresses!.shippingAddress?.toString() ?? 'null'}');
-            AppLogger.checkout('  - Billing address: ${state.defaultAddresses!.billingAddress?.toString() ?? 'null'}');
-            
+            AppLogger.checkout(
+              '  - Shipping address: ${state.defaultAddresses!.shippingAddress?.toString() ?? 'null'}',
+            );
+            AppLogger.checkout(
+              '  - Billing address: ${state.defaultAddresses!.billingAddress?.toString() ?? 'null'}',
+            );
+
             // Set default addresses
             _selectedShippingAddress = state.defaultAddresses!.shippingAddress;
             _selectedBillingAddress = state.defaultAddresses!.billingAddress;
             if (_useSameAddress) {
               _selectedBillingAddress = _selectedShippingAddress;
-              AppLogger.checkout('🏠 CheckoutScreen: Using same address for billing');
+              AppLogger.checkout(
+                '🏠 CheckoutScreen: Using same address for billing',
+              );
             }
             AppLogger.checkout('🏠 CheckoutScreen: Address selection updated');
           } else if (state.status == CheckoutStatus.checkoutInitiated) {
-            AppLogger.checkout('🏠 CheckoutScreen: Checkout initiated, navigating to review screen');
+            AppLogger.checkout(
+              '🏠 CheckoutScreen: Checkout initiated, navigating to review screen',
+            );
             // Navigate to review screen
             Navigator.pushReplacement(
               context,
@@ -65,7 +78,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
             );
           } else if (state.status == CheckoutStatus.error) {
-            AppLogger.checkout('❌ CheckoutScreen: Error occurred: ${state.errorMessage}');
+            AppLogger.checkout(
+              '❌ CheckoutScreen: Error occurred: ${state.errorMessage}',
+            );
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage ?? 'An error occurred'),
@@ -139,7 +154,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       title,
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
         fontWeight: FontWeight.bold,
-        color: Theme.of(context).primaryColor,
+        color: Colors.black,
       ),
     );
   }
@@ -178,10 +193,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.location_on,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                        Icon(Icons.location_on, color: AppColors.primary),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -199,7 +211,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor,
+                              color: AppColors.primary,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Text(
@@ -214,13 +226,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text(address.addressLine1),
+                    Text(
+                      address.addressLine1,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                     if (address.addressLine2 != null)
-                      Text(address.addressLine2!),
+                      Text(
+                        address.addressLine2!,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     Text(
                       '${address.city}, ${address.state} ${address.postalCode}',
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
-                    Text(address.country),
+                    Text(
+                      address.country,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       'Phone: ${address.phone}',
@@ -250,9 +272,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   void _selectAddress(String addressType) async {
     AppLogger.checkout('🏠 CheckoutScreen: Selecting $addressType address');
-    AppLogger.checkout('  - Current shipping address: ${_selectedShippingAddress?.toString() ?? 'null'}');
-    AppLogger.checkout('  - Current billing address: ${_selectedBillingAddress?.toString() ?? 'null'}');
-    
+    AppLogger.checkout(
+      '  - Current shipping address: ${_selectedShippingAddress?.toString() ?? 'null'}',
+    );
+    AppLogger.checkout(
+      '  - Current billing address: ${_selectedBillingAddress?.toString() ?? 'null'}',
+    );
+
     final result = await Navigator.push<Address>(
       context,
       MaterialPageRoute(
@@ -266,38 +292,56 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
     );
 
-    AppLogger.checkout('🏠 CheckoutScreen: Address selection result: ${result?.toString() ?? 'null'}');
+    AppLogger.checkout(
+      '🏠 CheckoutScreen: Address selection result: ${result?.toString() ?? 'null'}',
+    );
 
     if (result != null) {
-      AppLogger.checkout('🏠 CheckoutScreen: Updating address selection for $addressType');
+      AppLogger.checkout(
+        '🏠 CheckoutScreen: Updating address selection for $addressType',
+      );
       setState(() {
         if (addressType == 'shipping') {
           _selectedShippingAddress = result;
           if (_useSameAddress) {
             _selectedBillingAddress = result;
-            AppLogger.checkout('🏠 CheckoutScreen: Updated both shipping and billing addresses');
+            AppLogger.checkout(
+              '🏠 CheckoutScreen: Updated both shipping and billing addresses',
+            );
           } else {
-            AppLogger.checkout('🏠 CheckoutScreen: Updated shipping address only');
+            AppLogger.checkout(
+              '🏠 CheckoutScreen: Updated shipping address only',
+            );
           }
         } else {
           _selectedBillingAddress = result;
           AppLogger.checkout('🏠 CheckoutScreen: Updated billing address only');
         }
       });
-      AppLogger.checkout('🏠 CheckoutScreen: Address selection updated successfully');
+      AppLogger.checkout(
+        '🏠 CheckoutScreen: Address selection updated successfully',
+      );
     } else {
-      AppLogger.checkout('🏠 CheckoutScreen: No address selected, keeping current selection');
+      AppLogger.checkout(
+        '🏠 CheckoutScreen: No address selected, keeping current selection',
+      );
     }
   }
 
   void _proceedToCheckout() {
     AppLogger.checkout('🏠 CheckoutScreen: Proceeding to checkout');
-    AppLogger.checkout('  - Selected shipping address: ${_selectedShippingAddress?.toString() ?? 'null'}');
-    AppLogger.checkout('  - Selected billing address: ${_selectedBillingAddress?.toString() ?? 'null'}');
+    AppLogger.checkout(
+      '  - Selected shipping address: ${_selectedShippingAddress?.toString() ?? 'null'}',
+    );
+    AppLogger.checkout(
+      '  - Selected billing address: ${_selectedBillingAddress?.toString() ?? 'null'}',
+    );
     AppLogger.checkout('  - Use same address: $_useSameAddress');
-    
+
     if (_selectedShippingAddress == null) {
-      AppLogger.checkout('❌ CheckoutScreen: Cannot proceed - no shipping address selected');
+      AppLogger.checkout(
+        '❌ CheckoutScreen: Cannot proceed - no shipping address selected',
+      );
       return;
     }
 
@@ -306,13 +350,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         : _selectedBillingAddress!.id;
 
     AppLogger.checkout('🏠 CheckoutScreen: Initiating checkout with:');
-    AppLogger.checkout('  - Shipping address ID: ${_selectedShippingAddress!.id}');
+    AppLogger.checkout(
+      '  - Shipping address ID: ${_selectedShippingAddress!.id}',
+    );
     AppLogger.checkout('  - Billing address ID: $billingAddressId');
 
     context.read<CheckoutCubit>().initiateCheckout(
-          userData: widget.userData,
-          shippingAddressId: _selectedShippingAddress!.id,
-          billingAddressId: billingAddressId,
-        );
+      userData: widget.userData,
+      shippingAddressId: _selectedShippingAddress!.id,
+      billingAddressId: billingAddressId,
+    );
   }
 }

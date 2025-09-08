@@ -315,20 +315,62 @@ class CheckoutItem extends Equatable {
         productData['name']?.toString() ??
         json['productName']?.toString() ??
         '';
-    final regularPrice =
-        double.tryParse(productData['regularPrice']?.toString() ?? '') ?? 0.0;
-    final salePrice =
-        double.tryParse(productData['salePrice']?.toString() ?? '') ?? 0.0;
-
-    AppLogger.checkout('Price ==> $salePrice');
-    AppLogger.checkout('Price ==> $regularPrice');
-    // Use sale price if available, otherwise regular price
-    final unitPrice = salePrice > 0 ? salePrice : regularPrice;
+    
+    // Try to get price from multiple possible locations
+    double unitPrice = 0.0;
+    
+    // First try direct price fields in the item
+    if (json['unitPrice'] != null) {
+      unitPrice = double.tryParse(json['unitPrice'].toString()) ?? 0.0;
+      AppLogger.checkout('Unit price from direct field: $unitPrice');
+    } else if (json['price'] != null) {
+      unitPrice = double.tryParse(json['price'].toString()) ?? 0.0;
+      AppLogger.checkout('Unit price from price field: $unitPrice');
+    } else if (json['unit_price'] != null) {
+      unitPrice = double.tryParse(json['unit_price'].toString()) ?? 0.0;
+      AppLogger.checkout('Unit price from unit_price field: $unitPrice');
+    }
+    
+    // If not found, try from product data
+    if (unitPrice == 0.0) {
+      final regularPrice =
+          double.tryParse(productData['regularPrice']?.toString() ?? '') ?? 0.0;
+      final salePrice =
+          double.tryParse(productData['salePrice']?.toString() ?? '') ?? 0.0;
+      
+      AppLogger.checkout('Price from product data ==> sale: $salePrice, regular: $regularPrice');
+      // Use sale price if available, otherwise regular price
+      unitPrice = salePrice > 0 ? salePrice : regularPrice;
+    }
+    
+    // If still 0, try other price fields in product data
+    if (unitPrice == 0.0) {
+      unitPrice = double.tryParse(productData['price']?.toString() ?? '') ?? 0.0;
+      AppLogger.checkout('Unit price from product price field: $unitPrice');
+    }
+    
+    // If still 0, this might be a backend issue - log warning
+    if (unitPrice == 0.0) {
+      AppLogger.checkout('⚠️ WARNING: Unit price is 0.0 - this might be a backend issue');
+      AppLogger.checkout('Available fields in item: ${json.keys.toList()}');
+      AppLogger.checkout('Available fields in product: ${productData.keys.toList()}');
+    }
+    
     final quantity = json['quantity'] is int
         ? json['quantity'] as int
         : int.tryParse(json['quantity']?.toString() ?? '0') ?? 0;
 
-    final totalPrice = unitPrice * quantity;
+    // Try to get total price directly, otherwise calculate it
+    double totalPrice = 0.0;
+    if (json['totalPrice'] != null) {
+      totalPrice = double.tryParse(json['totalPrice'].toString()) ?? 0.0;
+    } else if (json['total_price'] != null) {
+      totalPrice = double.tryParse(json['total_price'].toString()) ?? 0.0;
+    } else {
+      totalPrice = unitPrice * quantity;
+    }
+
+    AppLogger.checkout('🛒 CheckoutItem.fromJson: Final prices - unitPrice: $unitPrice, totalPrice: $totalPrice');
 
     // Extract image URL from product data
     String? imageUrl;
@@ -894,13 +936,18 @@ class Order extends Equatable {
             'totalAmount': json['totalAmount'] ?? json['total'],
           };
 
+      AppLogger.checkout('📦 Order.fromJson: Summary data: $summaryData');
       parsedSummary = CheckoutSummary.fromJson(summaryData);
 
       // If zeros and we have items, recalc from items
       if (parsedSummary.subtotal == 0.0 && parsedSummary.total == 0.0 && orderItems.isNotEmpty) {
+        AppLogger.checkout('📦 Order.fromJson: Recalculating summary from items');
         parsedSummary = CheckoutSummary.fromItems(orderItems);
       }
-    } catch (_) {
+      
+      AppLogger.checkout('📦 Order.fromJson: Final summary - subtotal: ${parsedSummary.subtotal}, total: ${parsedSummary.total}');
+    } catch (e) {
+      AppLogger.checkout('📦 Order.fromJson: Error parsing summary: $e');
       parsedSummary = CheckoutSummary.fromItems(orderItems);
     }
 

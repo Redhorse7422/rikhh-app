@@ -8,28 +8,42 @@ class OrderConfirmationScreen extends StatelessWidget {
 
   const OrderConfirmationScreen({super.key, required this.order});
 
+  // Helper method to get the order summary with fallback calculation
+  CheckoutSummary get _effectiveOrderSummary {
+    // If the order summary has zero values but we have items, recalculate
+    if (order.orderSummary.subtotal == 0.0 &&
+        order.orderSummary.total == 0.0 &&
+        order.items.isNotEmpty) {
+      return CheckoutSummary.fromItems(order.items);
+    }
+    return order.orderSummary;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CheckoutScaffold(
-      title: 'Order Confirmation',
-      showBackButton: false,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSuccessHeader(),
-            const SizedBox(height: 24),
-            _buildOrderInfo(context),
-            const SizedBox(height: 24),
-            _buildOrderItems(context),
-            const SizedBox(height: 24),
-            _buildOrderSummary(context),
-            const SizedBox(height: 24),
-            _buildDeliveryInfo(context),
-            const SizedBox(height: 32),
-            _buildActionButtons(context),
-          ],
+    return PopScope(
+      canPop: false, // Prevent back navigation
+      child: CheckoutScaffold(
+        title: 'Order Confirmation',
+        showBackButton: false,
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSuccessHeader(),
+              const SizedBox(height: 24),
+              _buildOrderInfo(context),
+              const SizedBox(height: 24),
+              _buildOrderItems(context),
+              const SizedBox(height: 24),
+              _buildOrderSummary(context),
+              const SizedBox(height: 24),
+              _buildDeliveryInfo(context),
+              const SizedBox(height: 32),
+              _buildActionButtons(context),
+            ],
+          ),
         ),
       ),
     );
@@ -107,56 +121,68 @@ class OrderConfirmationScreen extends StatelessWidget {
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            ...order.items.map(
-              (item) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(8),
-                        image: item.imageUrl != null
-                            ? DecorationImage(
-                                image: NetworkImage(item.imageUrl!),
-                                fit: BoxFit.cover,
-                                onError: (exception, stackTrace) {
-                                  // Handle image loading error
-                                },
-                              )
+            if (order.items.isEmpty)
+              const Text('No items found in this order')
+            else
+              ...order.items.map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(8),
+                          image: item.imageUrl != null
+                              ? DecorationImage(
+                                  image: NetworkImage(item.imageUrl!),
+                                  fit: BoxFit.cover,
+                                  onError: (exception, stackTrace) {
+                                    // Handle image loading error
+                                  },
+                                )
+                              : null,
+                        ),
+                        child: item.imageUrl == null
+                            ? const Icon(Icons.image)
                             : null,
                       ),
-                      child: item.imageUrl == null
-                          ? const Icon(Icons.image)
-                          : null,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.name,
-                            style: const TextStyle(fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 4),
-                          Text('Qty: ${item.quantity}'),
-                          Text(
-                            '\$${item.totalPrice.toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 4),
+                            Text('Qty: ${item.quantity}'),
+                            Text(
+                              'Unit: \$${item.unitPrice.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(
+                              'Total: \$${item.totalPrice.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -164,6 +190,8 @@ class OrderConfirmationScreen extends StatelessWidget {
   }
 
   Widget _buildOrderSummary(BuildContext context) {
+    final effectiveSummary = _effectiveOrderSummary;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -177,21 +205,21 @@ class OrderConfirmationScreen extends StatelessWidget {
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            _buildSummaryRow(context, 'Subtotal', order.orderSummary.subtotal),
-            _buildSummaryRow(context, 'Shipping', order.orderSummary.shipping),
-            _buildSummaryRow(context, 'Tax', order.orderSummary.tax),
-            if (order.orderSummary.discount > 0)
+            _buildSummaryRow(context, 'Subtotal', effectiveSummary.subtotal),
+            _buildSummaryRow(context, 'Shipping', effectiveSummary.shipping),
+            _buildSummaryRow(context, 'Tax', effectiveSummary.tax),
+            if (effectiveSummary.discount > 0)
               _buildSummaryRow(
                 context,
                 'Discount',
-                -order.orderSummary.discount,
+                -effectiveSummary.discount,
                 isDiscount: true,
               ),
             const Divider(),
             _buildSummaryRow(
               context,
               'Total',
-              order.orderSummary.total,
+              effectiveSummary.total,
               isTotal: true,
             ),
           ],
