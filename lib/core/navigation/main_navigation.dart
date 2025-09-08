@@ -11,42 +11,50 @@ import '../../features/profile/screens/profile_screen.dart';
 import '../theme/app_colors.dart';
 
 class MainNavigation extends StatefulWidget {
-  const MainNavigation({super.key});
+  final int initialIndex;
+  
+  const MainNavigation({super.key, this.initialIndex = 0});
 
   @override
   State<MainNavigation> createState() => _MainNavigationState();
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  int _currentIndex = 0;
-
-  List<Widget> get _screens => [
-    const HomeScreen(),
-    const CategoriesScreen(),
-    CartScreen(
-      onBackPressed: () {
-        setState(() {
-          _currentIndex = 0; // Go back to home
-        });
-      },
-    ),
-    const OrdersScreen(),
-    const ProfileScreen(),
-  ];
+  late int _currentIndex;
+  
+  // Cache screens to prevent recreation
+  late final List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
-    // Load cart data when navigation initializes (only if user is authenticated)
+    _currentIndex = widget.initialIndex;
+    
+    // Initialize all screens once to prevent recreation
+    _screens = [
+      const HomeScreen(),
+      const CategoriesScreen(),
+      CartScreen(
+        onBackPressed: () {
+          setState(() {
+            _currentIndex = 0; // Go back to home
+          });
+        },
+      ),
+      const OrdersScreen(),
+      const ProfileScreen(),
+    ];
+
+    // Defer cart loading to avoid blocking main thread
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Check if user is authenticated before loading cart
-      final authState = context.read<AuthBloc>().state;
-      if (authState is AuthAuthenticated) {
-        print('🔍 MainNavigation: User is authenticated, loading cart...');
-        context.read<CartCubit>().load(authState.user);
-      } else {
-        print('🔍 MainNavigation: User is not authenticated, skipping cart load');
-      }
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) {
+          final authState = context.read<AuthBloc>().state;
+          if (authState is AuthAuthenticated) {
+            context.read<CartCubit>().load(authState.user);
+          }
+        }
+      });
     });
   }
 
@@ -54,21 +62,18 @@ class _MainNavigationState extends State<MainNavigation> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        print('🔍 MainNavigation: Auth state changed to: ${state.runtimeType}');
-        // Load cart when user becomes authenticated
         if (state is AuthAuthenticated) {
-          print('🔍 MainNavigation: User authenticated, loading cart...');
           context.read<CartCubit>().load(state.user);
         } else if (state is AuthUnauthenticated) {
-          print('🔍 MainNavigation: User unauthenticated, clearing cart...');
-          // Clear cart when user logs out - just reset to initial state
-          // We can't call clear() without user data, so just reset the state
           context.read<CartCubit>().reset();
         }
       },
       child: Scaffold(
-        body: IndexedStack(index: _currentIndex, children: _screens),
-        bottomNavigationBar: _currentIndex == 2 ? null : _buildBottomNavigation(), // Hide bottom nav on cart screen
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _screens,
+        ),
+        bottomNavigationBar: _buildBottomNavigation(), // Show bottom nav on all screens including cart
       ),
     );
   }
@@ -118,8 +123,12 @@ class _MainNavigationState extends State<MainNavigation> {
             icon: BlocBuilder<CartCubit, CartState>(
               builder: (context, state) {
                 // Use summary itemsCount if available, otherwise calculate from items
-                final itemCount = state.summary?.itemsCount ?? 
-                    state.items.fold<int>(0, (sum, item) => sum + item.quantity);
+                final itemCount =
+                    state.summary?.itemsCount ??
+                    state.items.fold<int>(
+                      0,
+                      (sum, item) => sum + item.quantity,
+                    );
                 return Stack(
                   children: [
                     const Icon(Feather.shopping_bag),

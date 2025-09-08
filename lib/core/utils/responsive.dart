@@ -33,7 +33,6 @@ class Responsive {
       1024.0; // iPad landscape / small laptops
   static const double _desktopMediumBreakpoint = 1280.0; // standard laptops
   static const double _desktopLargeBreakpoint = 1440.0; // large monitors
-  static const double _ultraWideBreakpoint = 1920.0; // ultra-wide / 1080p+
 
   /// Scale a horizontal size based on screen width.
   static double scaleWidth(BuildContext context, double base) {

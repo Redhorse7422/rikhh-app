@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../features/auth/bloc/auth_bloc.dart';
 import '../../../core/routes/app_router.dart';
+import '../../../shared/components/optimized_image.dart';
+import '../../../core/services/image_optimization_service.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -75,11 +77,13 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 child: ClipOval(
                   child: userAvatar != null
-                      ? Image.network(
-                          userAvatar,
+                      ? OptimizedImage(
+                          imageUrl: userAvatar,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              _buildDefaultAvatar(),
+                          size: ImageSize.thumbnail,
+                          width: 60,
+                          height: 60,
+                          errorWidget: _buildDefaultAvatar(),
                         )
                       : _buildDefaultAvatar(),
                 ),

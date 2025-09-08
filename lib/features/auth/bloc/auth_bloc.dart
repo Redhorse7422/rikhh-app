@@ -45,15 +45,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthCheckStatusRequested event,
     Emitter<AuthState> emit,
   ) async {
-    print('🔍 AuthBloc: Checking authentication status...');
     final has = await _repo.hasToken();
-    print('🔍 AuthBloc: Has token: $has');
+
     if (has) {
       final user = await _repo.getUser();
-      print('🔍 AuthBloc: User data: ${user != null ? 'Found' : 'Not found'}');
+
       emit(AuthAuthenticated(user: user ?? {}));
     } else {
-      print('🔍 AuthBloc: No token, emitting unauthenticated');
       emit(AuthUnauthenticated());
     }
   }

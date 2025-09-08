@@ -1,31 +1,36 @@
 class ImageConfig {
-  // Image quality settings
-  static const int defaultQuality = 95;
-  static const int highQuality = 98;
-  static const int lowQuality = 80;
+  // Image quality settings - Balanced fast loading
+  static const int defaultQuality = 70; // Good balance of speed and quality
+  static const int highQuality = 80; // Good quality for detail images
+  static const int lowQuality = 60; // Decent quality for thumbnails
 
-  // Image dimensions for different use cases
-  static const int thumbnailWidth = 300;
-  static const int thumbnailHeight = 300;
+  // Image dimensions for different use cases - Balanced performance
+  static const int thumbnailWidth = 150; // Good size for thumbnails
+  static const int thumbnailHeight = 150; // Good size for thumbnails
 
-  static const int cardWidth = 400;
-  static const int cardHeight = 400;
+  static const int cardWidth = 200; // Good size for product cards
+  static const int cardHeight = 200; // Good size for product cards
 
-  static const int detailWidth = 900;
-  static const int detailHeight = 900;
+  static const int detailWidth = 400; // Good size for detail images
+  static const int detailHeight = 400; // Good size for detail images
 
-  // Cache settings
-  static const int maxCacheSize = 100 * 1024 * 1024; // 100MB
-  static const Duration cacheExpiry = Duration(days: 7);
+  // Cache settings - Balanced performance
+  static const int maxCacheSize = 50 * 1024 * 1024; // 50MB - Good balance
+  static const Duration cacheExpiry = Duration(
+    days: 3,
+  ); // Good balance for fresh content
 
   // Preload settings
-  static const int preloadBufferSize = 5; // Number of images to preload ahead
-  static const bool enablePreloading = true;
+  static const int preloadBufferSize = 3; // Balanced setting
+  static const bool enablePreloading =
+      true; // Re-enabled with better performance
 
-  // Network optimization
+  // Network optimization - Balanced fast loading
   static const bool enableWebP = true;
   static const bool enableCompression = true;
-  static const Duration connectionTimeout = Duration(seconds: 10);
+  static const Duration connectionTimeout = Duration(
+    seconds: 5,
+  ); // Good balance
 
   // Placeholder settings
   static const bool enableShimmer = true;
@@ -37,8 +42,8 @@ class ImageConfig {
   static const int maxRetryAttempts = 3;
 
   // Performance monitoring
-  static const bool enablePerformanceLogging = true;
-  static const bool trackImageLoadTimes = true;
+  static const bool enablePerformanceLogging = true; // Re-enabled
+  static const bool trackImageLoadTimes = true; // Re-enabled
 
   // CDN and optimization service settings
   static const String imageOptimizationService =
@@ -54,9 +59,9 @@ class ImageConfig {
   static const double lazyLoadingThreshold =
       0.1; // Start loading when 10% visible
 
-  // Memory management
+  // Memory management - Balanced performance
   static const bool enableMemoryOptimization = true;
-  static const int maxMemoryCacheSize = 50 * 1024 * 1024; // 50MB
+  static const int maxMemoryCacheSize = 25 * 1024 * 1024; // 25MB - Good balance
 
   // Get optimized URL parameters based on size
   static Map<String, String> getOptimizationParams({

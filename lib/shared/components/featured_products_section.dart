@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:rikhh_app/core/theme/app_colors.dart';
 import 'package:rikhh_app/core/utils/responsive.dart';
 import 'package:rikhh_app/features/products/bloc/products_bloc.dart';
@@ -9,8 +8,6 @@ import 'package:rikhh_app/features/products/screens/product_detail_screen.dart';
 import 'package:rikhh_app/shared/components/product_card.dart';
 import 'package:shimmer/shimmer.dart';
 
-/// A modern, responsive Featured Products section with adaptive grid,
-/// smooth transitions, touch-friendly interactions, and lazy-loaded images.
 class FeaturedProductsSection extends StatelessWidget {
   const FeaturedProductsSection({super.key});
 
@@ -105,12 +102,6 @@ class _AnimatedProductsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double crossAxisSpacing = Responsive.scaleWidth(context, 10);
-    final double mainAxisSpacing = Responsive.scaleHeight(context, 14);
-
-    // Use adaptive grid by setting a max item width so it auto-fits per screen
-    final double minItemWidth = _getTargetTileWidth(context);
-
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       switchInCurve: Curves.easeOutCubic,
@@ -162,19 +153,6 @@ class _AnimatedProductsGrid extends StatelessWidget {
         },
       ),
     );
-  }
-
-  double _getTargetTileWidth(BuildContext context) {
-    // Use relative width targets to remain device-agnostic
-    final double screenWidth = MediaQuery.of(context).size.width;
-    if (screenWidth < 320) return screenWidth / 2.4; // tiny devices
-    if (screenWidth < 360) return screenWidth / 2.6;
-    if (screenWidth < 414) return screenWidth / 3.0;
-    if (screenWidth < 480) return screenWidth / 3.3;
-    if (screenWidth < 600) return screenWidth / 3.5;
-    if (screenWidth < 768) return screenWidth / 4.0; // large phones
-    if (screenWidth < 1024) return screenWidth / 5.0; // tablets
-    return screenWidth / 6.0; // desktops
   }
 }
 

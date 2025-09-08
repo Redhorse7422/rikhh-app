@@ -5,13 +5,17 @@ class VariantSelection extends Equatable {
   final String? attributeValueId;
   final String? attributeValue;
 
-  const VariantSelection({this.attributeId, this.attributeValueId, this.attributeValue});
+  const VariantSelection({
+    this.attributeId,
+    this.attributeValueId,
+    this.attributeValue,
+  });
 
   Map<String, dynamic> toJson() => {
-        if (attributeId != null) 'attributeId': attributeId,
-        if (attributeValueId != null) 'attributeValueId': attributeValueId,
-        if (attributeValue != null) 'attributeValue': attributeValue,
-      };
+    if (attributeId != null) 'attributeId': attributeId,
+    if (attributeValueId != null) 'attributeValueId': attributeValueId,
+    if (attributeValue != null) 'attributeValue': attributeValue,
+  };
 
   @override
   List<Object?> get props => [attributeId, attributeValueId, attributeValue];
@@ -40,7 +44,7 @@ class CartItem extends Equatable {
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
     // Helper function to safely convert to double
-    double _toDouble(dynamic value) {
+    double toDouble(dynamic value) {
       if (value == null) return 0.0;
       if (value is num) return value.toDouble();
       if (value is String) {
@@ -50,7 +54,7 @@ class CartItem extends Equatable {
     }
 
     // Helper function to safely convert to int
-    int _toInt(dynamic value) {
+    int toInt(dynamic value) {
       if (value == null) return 1;
       if (value is num) return value.toInt();
       if (value is String) {
@@ -59,51 +63,103 @@ class CartItem extends Equatable {
       return 1;
     }
 
-    final quantity = _toInt(json['quantity']);
-    final price = _toDouble(json['price'] ?? json['unitPrice']);
-    final lineTotalFromApi = _toDouble(json['lineTotal'] ?? json['total']);
-    final calculatedLineTotal = price * quantity;
-    
-    print('🔍 CartItem.fromJson: Parsing item data:');
-    print('  - Raw JSON: $json');
-    print('  - quantity: ${json['quantity']} -> $quantity');
-    print('  - price: ${json['price'] ?? json['unitPrice']} -> $price');
-    print('  - lineTotal from API: ${json['lineTotal'] ?? json['total']} -> $lineTotalFromApi');
-    print('  - calculated lineTotal: $calculatedLineTotal');
-    print('  - final lineTotal: ${lineTotalFromApi > 0 ? lineTotalFromApi : calculatedLineTotal}');
-    
+    // Helper function to safely parse variants
+    List<VariantSelection> parseVariants(Map<String, dynamic> json) {
+      try {
+        final variantsData = json['variants'];
+        if (variantsData == null) {
+          return const [];
+        }
+
+        if (variantsData is! List) {
+          return const [];
+        }
+
+        if (variantsData.isEmpty) {
+          return const [];
+        }
+
+        final variants = <VariantSelection>[];
+        for (int i = 0; i < variantsData.length; i++) {
+          try {
+            final variantData = variantsData[i];
+            if (variantData is Map<String, dynamic>) {
+              final variant = VariantSelection(
+                attributeId: variantData['attributeId']?.toString(),
+                attributeValueId: variantData['attributeValueId']?.toString(),
+                attributeValue: variantData['attributeValue']?.toString(),
+              );
+              variants.add(variant);
+            }
+          } catch (e) {
+            // Skip invalid variants
+          }
+        }
+
+        return variants;
+      } catch (e) {
+        return const [];
+      }
+    }
+
+    final quantity = toInt(json['quantity']);
+    final price = toDouble(json['price'] ?? json['unitPrice']);
+    final lineTotalFromApi = toDouble(json['lineTotal'] ?? json['total']);
+    // Extract thumbnail URL - handle both string and object formats
+    String? thumbnailUrl;
+    final productThumbnailImg = json['product']?['thumbnailImg'];
+    if (productThumbnailImg is String) {
+      thumbnailUrl = productThumbnailImg;
+    } else if (productThumbnailImg is Map<String, dynamic>) {
+      thumbnailUrl = productThumbnailImg['url']?.toString();
+    } else {
+      thumbnailUrl = json['thumbnailUrl']?.toString();
+    }
+    List<VariantSelection> variants;
+    try {
+      variants = parseVariants(json);
+    } catch (e) {
+      variants = const [];
+    }
     return CartItem(
       id: json['id']?.toString() ?? '',
       productId: json['productId']?.toString() ?? '',
-      name: json['product']?['name']?.toString() ?? json['name']?.toString() ?? 'Product',
-      thumbnailUrl: (json['product']?['thumbnailImg']?['url'] ?? json['thumbnailUrl'])?.toString(),
+      name:
+          json['product']?['name']?.toString() ??
+          json['name']?.toString() ??
+          'Product',
+      thumbnailUrl: thumbnailUrl,
       quantity: quantity,
       price: price,
-      lineTotal: lineTotalFromApi > 0 ? lineTotalFromApi : price * quantity, // Fallback calculation
-      variants: (json['variants'] as List?)
-              ?.map((e) => VariantSelection(
-                    attributeId: e['attributeId']?.toString(),
-                    attributeValueId: e['attributeValueId']?.toString(),
-                    attributeValue: e['attributeValue']?.toString(),
-                  ))
-              .toList() ??
-          const [],
+      lineTotal: lineTotalFromApi > 0
+          ? lineTotalFromApi
+          : price * quantity, // Fallback calculation
+      variants: variants,
     );
   }
 
   CartItem copyWith({int? quantity}) => CartItem(
-        id: id,
-        productId: productId,
-        name: name,
-        thumbnailUrl: thumbnailUrl,
-        quantity: quantity ?? this.quantity,
-        price: price,
-        lineTotal: price * (quantity ?? this.quantity),
-        variants: variants,
-      );
+    id: id,
+    productId: productId,
+    name: name,
+    thumbnailUrl: thumbnailUrl,
+    quantity: quantity ?? this.quantity,
+    price: price,
+    lineTotal: price * (quantity ?? this.quantity),
+    variants: variants,
+  );
 
   @override
-  List<Object?> get props => [id, productId, name, thumbnailUrl, quantity, price, lineTotal, variants];
+  List<Object?> get props => [
+    id,
+    productId,
+    name,
+    thumbnailUrl,
+    quantity,
+    price,
+    lineTotal,
+    variants,
+  ];
 
   @override
   String toString() {
@@ -117,11 +173,16 @@ class CartSummary extends Equatable {
   final double discount;
   final double total;
 
-  const CartSummary({required this.itemsCount, required this.subtotal, required this.discount, required this.total});
+  const CartSummary({
+    required this.itemsCount,
+    required this.subtotal,
+    required this.discount,
+    required this.total,
+  });
 
   factory CartSummary.fromJson(Map<String, dynamic> json) {
     // Helper function to safely convert to double
-    double _toDouble(dynamic value) {
+    double toDouble(dynamic value) {
       if (value == null) return 0.0;
       if (value is num) return value.toDouble();
       if (value is String) {
@@ -131,7 +192,7 @@ class CartSummary extends Equatable {
     }
 
     // Helper function to safely convert to int
-    int _toInt(dynamic value) {
+    int toInt(dynamic value) {
       if (value == null) return 0;
       if (value is num) return value.toInt();
       if (value is String) {
@@ -140,17 +201,14 @@ class CartSummary extends Equatable {
       return 0;
     }
 
-    final itemsCount = _toInt(json['totalItems'] ?? json['itemsCount'] ?? json['count']);
-    final subtotal = _toDouble(json['totalAmount'] ?? json['subtotal']);
-    final discount = _toDouble(json['discount'] ?? 0.0);
-    final total = _toDouble(json['totalAmount'] ?? json['total']);
-    
-    print('🔍 CartSummary.fromJson: Parsing summary data:');
-    print('  - Raw JSON: $json');
-    print('  - totalItems: ${json['totalItems']} -> itemsCount: $itemsCount');
-    print('  - totalAmount: ${json['totalAmount']} -> subtotal: $subtotal, total: $total');
-    print('  - discount: ${json['discount']} -> $discount');
-    
+    final itemsCount = toInt(
+      json['totalItems'] ?? json['itemsCount'] ?? json['count'],
+    );
+
+    final subtotal = toDouble(json['totalAmount'] ?? json['subtotal']);
+    final discount = toDouble(json['discount'] ?? 0.0);
+    final total = toDouble(json['totalAmount'] ?? json['total']);
+
     return CartSummary(
       itemsCount: itemsCount,
       subtotal: subtotal,
@@ -167,5 +225,3 @@ class CartSummary extends Equatable {
     return 'CartSummary(itemsCount: $itemsCount, subtotal: $subtotal, discount: $discount, total: $total)';
   }
 }
-
-

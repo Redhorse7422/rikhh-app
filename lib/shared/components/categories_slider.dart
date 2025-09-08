@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:rikhh_app/core/theme/app_colors.dart';
 import 'package:rikhh_app/core/utils/responsive.dart';
 import 'package:rikhh_app/features/products/models/product_model.dart';
+import 'package:rikhh_app/shared/components/optimized_image.dart';
+import 'package:rikhh_app/core/services/image_optimization_service.dart';
 
 class CategoriesSlider extends StatelessWidget {
   final List<ProductCategory> categories;
@@ -18,7 +20,6 @@ class CategoriesSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fontSize = Responsive.getProductCardFontSize(context, baseSize: 12.0);
-
     return SizedBox(
       height: 90, // bigger height for image + text
       child: ListView.builder(
@@ -61,11 +62,13 @@ class CategoriesSlider extends StatelessWidget {
                       ],
                     ),
                     child: ClipOval(
-                      child: Image.network(
-                        categories[index].image ?? '',
+                      child: OptimizedImage(
+                        imageUrl: categories[index].image ?? '',
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            Icon(Icons.image, color: Colors.grey),
+                        size: ImageSize.thumbnail,
+                        width: 50,
+                        height: 50,
+                        errorWidget: Icon(Icons.category, color: Colors.grey),
                       ),
                     ),
                   ),

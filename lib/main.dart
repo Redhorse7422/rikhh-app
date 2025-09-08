@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/app_config.dart';
 import 'core/theme/app_theme.dart';
+import 'core/services/image_cache_service.dart';
 import 'features/products/bloc/products_bloc.dart';
 import 'features/products/bloc/categories_bloc.dart';
 import 'features/products/repositories/products_repository.dart';
@@ -10,8 +11,12 @@ import 'features/auth/repositories/auth_repository.dart';
 import 'features/home/bloc/location_bloc.dart';
 import 'core/routes/app_router.dart';
 import 'features/cart/bloc/cart_cubit.dart';
+import 'features/checkout/bloc/checkout_cubit.dart';
 
 void main() {
+  // Initialize image cache configuration for better performance
+  ImageCacheService.initialize();
+  
   runApp(const MyApp());
 }
 
@@ -31,10 +36,19 @@ class MyApp extends StatelessWidget {
               ProductsBloc(productsRepository: ProductsRepositoryImpl()),
         ),
         BlocProvider<AuthBloc>(
-          create: (context) => AuthBloc(repo: AuthRepository()),
+          create: (context) {
+            // Create AuthRepository lazily to avoid circular dependencies
+            final authRepo = AuthRepository();
+            return AuthBloc(repo: authRepo);
+          },
         ),
         BlocProvider<LocationBloc>(create: (context) => LocationBloc()),
         BlocProvider<CartCubit>(create: (context) => CartCubit()),
+        BlocProvider<CheckoutCubit>(
+          create: (context) => CheckoutCubit(
+            cartCubit: context.read<CartCubit>(),
+          ),
+        ),
       ],
       child: MaterialApp.router(
         title: AppConfig.appName,

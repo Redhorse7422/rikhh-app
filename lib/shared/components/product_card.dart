@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:rikhh_app/core/utils/to_camel_case.dart';
-import 'package:rikhh_app/shared/components/skewed_badge.dart';
 import 'package:rikhh_app/shared/components/optimized_image.dart';
 import 'package:rikhh_app/core/services/image_optimization_service.dart';
 import '../../core/theme/app_colors.dart';
@@ -43,7 +42,7 @@ class ProductCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withValues(alpha: 0.2),
               spreadRadius: 1,
               blurRadius: 4,
               offset: Offset(0, 2),

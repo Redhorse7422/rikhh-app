@@ -4,11 +4,11 @@ class AppConfig {
   static const String appVersion = '1.0.0';
 
   // Environment Configuration
-  static const bool isDevelopment = true; // Set to false for production
+  static const bool isDevelopment = false; // Set to false for production
   // If true, prefer using LAN IP for development (for physical devices)
-  static const bool useLanIpInDev = true;
+  static const bool useLanIpInDev = false;
   // Replace with your machine's LAN IP when useLanIpInDev is true
-  static const String devLanIp = '172.28.96.1';
+  static const String devLanIp = '172.23.48.1';
 
   // API Configuration
   static String get baseUrl {
@@ -20,7 +20,7 @@ class AppConfig {
     // Development URL selection
     return 'http://$devLanIp:3001/api';
   }
-  
+
   // Test if the server is reachable
   static String get serverTestUrl {
     if (!isDevelopment) {
@@ -38,6 +38,7 @@ class AppConfig {
   // API Endpoints
   static const String loginEndpoint = '/auth/login';
   static const String registerEndpoint = '/auth/register';
+  static const String refreshTokenEndpoint = '/auth/refresh-token';
   static const String productsEndpoint = '/products';
   static const String categoriesEndpoint = '/categories';
   static const String cartEndpoint = '/cart';
@@ -46,6 +47,7 @@ class AppConfig {
 
   // Storage Keys
   static const String tokenKey = 'auth_token';
+  static const String refreshTokenKey = 'refresh_token';
   static const String userKey = 'user_data';
   static const String cartKey = 'cart_data';
   static const String themeKey = 'app_theme';

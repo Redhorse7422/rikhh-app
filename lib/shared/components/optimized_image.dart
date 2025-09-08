@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/services/image_optimization_service.dart';
 
@@ -89,6 +90,11 @@ class OptimizedImage extends StatelessWidget {
       memCacheWidth: cacheW,
       memCacheHeight: cacheH,
       httpHeaders: service.getOptimizedHeaders(),
+      // Add retry configuration for better reliability
+      cacheManager: DefaultCacheManager(),
+      // Enable fade in animation for smoother loading
+      fadeInDuration: const Duration(milliseconds: 200),
+      fadeOutDuration: const Duration(milliseconds: 100),
     );
 
     // Apply border radius if specified

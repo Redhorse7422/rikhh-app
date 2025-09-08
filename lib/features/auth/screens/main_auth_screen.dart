@@ -146,7 +146,6 @@ class _MainAuthScreenState extends State<MainAuthScreen> {
             //     child: InkWell(
             //       onTap: () {
             //         // Handle Google sign in
-            //         print('Google sign in pressed');
             //       },
             //       borderRadius: BorderRadius.circular(12),
             //       child: Row(

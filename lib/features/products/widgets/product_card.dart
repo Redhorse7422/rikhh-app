@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../shared/components/optimized_image.dart';
 import '../../../core/services/image_optimization_service.dart';
 import '../models/product_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/components/skewed_badge.dart';
 import '../../../core/utils/responsive.dart';
-import '../../cart/bloc/cart_cubit.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -28,10 +26,13 @@ class ProductCard extends StatelessWidget {
     // Get responsive dimensions using the utility class
     final padding = Responsive.getProductCardPadding(context);
     final fontSize = Responsive.getProductCardFontSize(context, baseSize: 12.0);
-    final priceFontSize = Responsive.getProductCardFontSize(context, baseSize: 16.0);
+    final priceFontSize = Responsive.getProductCardFontSize(
+      context,
+      baseSize: 16.0,
+    );
     final badgeTop = Responsive.isSmallScreen(context) ? 4.0 : 6.0;
     final badgeLeft = Responsive.isSmallScreen(context) ? 4.0 : 6.0;
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -109,7 +110,9 @@ class ProductCard extends StatelessWidget {
                   // Wishlist Button with responsive positioning
                   Positioned(
                     top: badgeTop,
-                    right: (product.inStock ?? false) ? badgeLeft : (Responsive.isSmallScreen(context) ? 60.0 : 80.0),
+                    right: (product.inStock ?? false)
+                        ? badgeLeft
+                        : (Responsive.isSmallScreen(context) ? 60.0 : 80.0),
                     child: Container(
                       width: Responsive.isSmallScreen(context) ? 28.0 : 32.0,
                       height: Responsive.isSmallScreen(context) ? 28.0 : 32.0,
@@ -146,7 +149,10 @@ class ProductCard extends StatelessWidget {
                       right: badgeLeft,
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           minimumSize: const Size(0, 0),
                         ),
                         onPressed: () async {
@@ -157,7 +163,9 @@ class ProductCard extends StatelessWidget {
                             );
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Failed to add to cart: $e')),
+                              SnackBar(
+                                content: Text('Failed to add to cart: $e'),
+                              ),
                             );
                           }
                         },
@@ -182,9 +190,9 @@ class ProductCard extends StatelessWidget {
                       Row(
                         children: [
                           Icon(
-                            Feather.star, 
-                            size: fontSize, 
-                            color: Colors.orange
+                            Feather.star,
+                            size: fontSize,
+                            color: Colors.orange,
                           ),
                           SizedBox(width: padding * 0.33),
                           Text(

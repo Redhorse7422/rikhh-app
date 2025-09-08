@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import '../../../core/network/dio_client.dart';
+import '../../../core/utils/app_logger.dart';
 
 class AuthApiService {
   final Dio _dio = DioClient.instance;
@@ -9,18 +10,11 @@ class AuthApiService {
     required String password,
   }) async {
     try {
-      print('🔍 AuthApiService: Attempting login for email: $email');
-      print('🔍 AuthApiService: Request URL: ${_dio.options.baseUrl}/auth/login');
-      print('🔍 AuthApiService: Request headers: ${_dio.options.headers}');
-      
       final response = await _dio.post(
         '/auth/login',
         data: {'email': email, 'password': password, 'userType': 'buyer'},
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
-      
-      print('🔍 AuthApiService: Login response received: ${response.statusCode}');
-      print('🔍 AuthApiService: Response data: ${response.data}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data is Map<String, dynamic>
@@ -31,10 +25,15 @@ class AuthApiService {
         if (data['code'] == 0 && data['message'] == 'Login successful') {
           final userData = data['data'] as Map<String, dynamic>;
           final token = userData['accessToken'] as String?;
+          final refreshToken = userData['refreshToken'] as String?;
           final user = userData;
 
           if (token != null && token.isNotEmpty) {
-            return LoginResult(token: token, user: user);
+            return LoginResult(
+              token: token,
+              refreshToken: refreshToken,
+              user: user,
+            );
           }
           throw Exception('Access token missing in response');
         } else {
@@ -44,14 +43,60 @@ class AuthApiService {
 
       throw Exception('Login failed: ${response.statusCode}');
     } catch (e) {
-      print('🔍 AuthApiService: Login error: $e');
       if (e is DioException) {
-        print('🔍 AuthApiService: DioException type: ${e.type}');
-        print('🔍 AuthApiService: DioException message: ${e.message}');
-        print('🔍 AuthApiService: Request URL: ${e.requestOptions.uri}');
         if (e.response != null) {
-          print('🔍 AuthApiService: Response status: ${e.response?.statusCode}');
-          print('🔍 AuthApiService: Response data: ${e.response?.data}');
+          AppLogger.auth(
+            'Response status: ${e.response?.statusCode}',
+          );
+          AppLogger.auth('Response data: ${e.response?.data}');
+        }
+      }
+      rethrow;
+    }
+  }
+
+  Future<RefreshTokenResult> refreshToken({
+    required String refreshToken,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/auth/refresh-token',
+        data: {'refreshToken': refreshToken},
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data is Map<String, dynamic>
+            ? response.data as Map<String, dynamic>
+            : Map<String, dynamic>.from(response.data);
+
+        // Check if refresh was successful
+        if (data['code'] == 0 &&
+            data['message'] == 'Token refreshed successfully') {
+          final tokenData = data['data'] as Map<String, dynamic>;
+          final newToken = tokenData['accessToken'] as String?;
+          final newRefreshToken = tokenData['refreshToken'] as String?;
+
+          if (newToken != null && newToken.isNotEmpty) {
+            return RefreshTokenResult(
+              token: newToken,
+              refreshToken: newRefreshToken,
+            );
+          }
+          throw Exception('New access token missing in response');
+        } else {
+          throw Exception(data['message'] ?? 'Token refresh failed');
+        }
+      }
+
+      throw Exception('Token refresh failed: ${response.statusCode}');
+    } catch (e) {
+      if (e is DioException) {
+        if (e.response != null) {
+          AppLogger.auth(
+            'Response status: ${e.response?.statusCode}',
+          );
+          AppLogger.auth('Response data: ${e.response?.data}');
         }
       }
       rethrow;
@@ -61,7 +106,15 @@ class AuthApiService {
 
 class LoginResult {
   final String token;
+  final String? refreshToken;
   final Map<String, dynamic> user;
 
-  LoginResult({required this.token, required this.user});
+  LoginResult({required this.token, this.refreshToken, required this.user});
+}
+
+class RefreshTokenResult {
+  final String token;
+  final String? refreshToken;
+
+  RefreshTokenResult({required this.token, this.refreshToken});
 }

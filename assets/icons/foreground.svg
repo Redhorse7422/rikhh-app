@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- White Flutter-style mark -->
+  <g transform="translate(150,120)" fill="#FFFFFF">
+    <polygon points="0,0 220,0 360,140 140,360 0,360" />
+    <polygon points="350,0 570,0 570,220 430,360 290,220 350,160" />
+    <polygon points="120,420 340,420 460,540 340,660 120,660" />
+  </g>
+
+  <!-- rikhh test text converted to paths (centered at bottom) -->
+  <g transform="translate(100,780) scale(1.2)" fill="#FFFFFF">
+    <path d="M50 0 L70 0 L70 -40 Q70 -60 50 -60 Q30 -60 30 -40 L30 0 Z" /> <!-- r -->
+    <rect x="90" y="-60" width="20" height="60" /> <!-- i -->
+    <path d="M130 0 L150 0 L150 -40 Q150 -60 130 -60 Q110 -60 110 -40 L110 0 Z" /> <!-- k -->
+    <rect x="170" y="-60" width="20" height="60" /> <!-- h -->
+    <rect x="210" y="-60" width="20" height="60" /> <!-- h -->
+    <path d="M260 0 L280 -60 L300 0 Z" /> <!-- t -->
+    <path d="M320 0 L360 0 Q380 0 380 -20 Q380 -40 360 -40 L320 -40 Z" /> <!-- e -->
+    <rect x="400" y="-60" width="20" height="60" /> <!-- s -->
+    <rect x="440" y="-60" width="20" height="60" /> <!-- t -->
+  </g>
+</svg>

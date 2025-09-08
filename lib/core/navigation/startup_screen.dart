@@ -7,6 +7,7 @@ import '../../features/auth/screens/auth_screen.dart';
 import '../../features/auth/bloc/auth_bloc.dart';
 import '../network/dio_client.dart';
 import '../routes/app_router.dart';
+import '../../shared/components/app_logo.dart';
 
 class StartupScreen extends StatefulWidget {
   const StartupScreen({super.key});
@@ -23,24 +24,23 @@ class _StartupScreenState extends State<StartupScreen> {
   }
 
   Future<void> _bootstrap() async {
-    print('🔍 StartupScreen: Starting bootstrap...');
-    
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString(AppConfig.tokenKey);
-    print('🔍 StartupScreen: Token found: ${token != null ? 'Yes (${token.length} chars)' : 'No'}');
-
-    // Configure Dio with token if present
-    DioClient.updateAuthToken(token);
-    print('🔍 StartupScreen: DioClient configured with token');
-    
-    // Verify token is properly set in DioClient
-    final currentToken = DioClient.getCurrentToken();
-    print('🔍 StartupScreen: DioClient current token: ${currentToken != null ? 'Yes (${currentToken.length} chars)' : 'No'}');
-
-    // Check authentication status
-    if (mounted) {
-      print('🔍 StartupScreen: Checking auth status...');
-      context.read<AuthBloc>().add(AuthCheckStatusRequested());
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString(AppConfig.tokenKey);
+      // Configure Dio with token if present
+      DioClient.updateAuthToken(token);
+      
+      // Add small delay to prevent blocking main thread
+      await Future.delayed(const Duration(milliseconds: 50));
+      
+      if (mounted) {
+        context.read<AuthBloc>().add(AuthCheckStatusRequested());
+      }
+    } catch (e) {
+      // Handle bootstrap errors gracefully
+      if (mounted) {
+        context.read<AuthBloc>().add(AuthCheckStatusRequested());
+      }
     }
   }
 
@@ -58,14 +58,26 @@ class _StartupScreenState extends State<StartupScreen> {
         if (state is AuthUnauthenticated) {
           return const AuthScreen();
         }
-        return const Scaffold(
+        return Scaffold(
+          backgroundColor: Colors.white,
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Loading...'),
+                // App Logo
+                RikhhLogo.splash(),
+                const SizedBox(height: 32),
+                // Loading indicator
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(
+                  'Loading...',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),

@@ -148,21 +148,40 @@ class PromoBannerCarousel extends StatefulWidget {
     this.imageSize = 60,
     this.viewportFraction = 1,
     this.autoPlay = false,
-    this.autoPlayInterval = const Duration(seconds: 5),
+    this.autoPlayInterval = const Duration(seconds: 10),
   });
 
   @override
   State<PromoBannerCarousel> createState() => _PromoBannerCarouselState();
 }
 
-class _PromoBannerCarouselState extends State<PromoBannerCarousel> {
+class _PromoBannerCarouselState extends State<PromoBannerCarousel>
+    with TickerProviderStateMixin {
   late PageController _pageController;
   int _currentPage = 0;
+  late AnimationController _progressController;
+  late Animation<double> _progressAnimation;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(viewportFraction: widget.viewportFraction);
+
+    // Initialize progress animation controller
+    _progressController = AnimationController(
+      duration: widget.autoPlayInterval,
+      vsync: this,
+    );
+    _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _progressController, curve: Curves.linear),
+    );
+
+    // Listen to progress animation completion
+    _progressController.addStatusListener((status) {
+      if (status == AnimationStatus.completed && widget.autoPlay) {
+        _nextPage();
+      }
+    });
 
     if (widget.autoPlay && widget.banners.isNotEmpty) {
       _startAutoPlay();
@@ -170,30 +189,30 @@ class _PromoBannerCarouselState extends State<PromoBannerCarousel> {
   }
 
   void _startAutoPlay() {
-    Future.delayed(widget.autoPlayInterval, () {
-      if (mounted && widget.autoPlay && _pageController.hasClients) {
-        try {
-          if (_currentPage < widget.banners.length - 1) {
-            _pageController.nextPage(
-              duration: const Duration(milliseconds: 800),
-              curve: Curves.easeInOut,
-            );
-          } else {
-            _pageController.animateToPage(
-              0,
-              duration: const Duration(milliseconds: 800),
-              curve: Curves.easeInOut,
-            );
-          }
-          // Only continue auto-play if still mounted and auto-play is enabled
-          if (mounted && widget.autoPlay) {
-            _startAutoPlay();
-          }
-        } catch (e) {
-          // Handle any errors gracefully
+    if (widget.autoPlay && widget.banners.isNotEmpty) {
+      _progressController.forward();
+    }
+  }
+
+  void _nextPage() {
+    if (_pageController.hasClients) {
+      try {
+        if (_currentPage < widget.banners.length - 1) {
+          _pageController.nextPage(
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeInOut,
+          );
+        } else {
+          _pageController.animateToPage(
+            0,
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeInOut,
+          );
         }
+      } catch (e) {
+        // Handle any errors gracefully
       }
-    });
+    }
   }
 
   @override
@@ -202,6 +221,7 @@ class _PromoBannerCarouselState extends State<PromoBannerCarousel> {
       if (_pageController.hasClients) {
         _pageController.dispose();
       }
+      _progressController.dispose();
     } catch (e) {
       // Handle disposal errors gracefully
     }
@@ -229,6 +249,11 @@ class _PromoBannerCarouselState extends State<PromoBannerCarousel> {
                 setState(() {
                   _currentPage = index;
                 });
+                // Reset and restart progress animation for new page
+                _progressController.reset();
+                if (widget.autoPlay) {
+                  _progressController.forward();
+                }
               },
               itemBuilder: (context, index) {
                 final banner = widget.banners[index];
@@ -249,15 +274,55 @@ class _PromoBannerCarouselState extends State<PromoBannerCarousel> {
               children: List.generate(
                 widget.banners.length,
                 (index) => Container(
-                  width: 8,
-                  height: 8,
+                  width: 28,
+                  height: 6,
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _currentPage == index
-                        ? Colors.white
-                        : Colors.white.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(4),
+                    color: Colors.grey.shade300,
                   ),
+                  child: _currentPage == index
+                      ? AnimatedBuilder(
+                          animation: _progressAnimation,
+                          builder: (context, child) {
+                            return Stack(
+                              children: [
+                                // Background
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4),
+                                    color: Colors.grey.shade300,
+                                  ),
+                                ),
+                                // Progress fill
+                                FractionallySizedBox(
+                                  widthFactor: _progressAnimation.value,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(4),
+                                      color: Colors.black87,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4),
+                            color: Colors.grey.shade300,
+                          ),
+                        ),
                 ),
               ),
             ),

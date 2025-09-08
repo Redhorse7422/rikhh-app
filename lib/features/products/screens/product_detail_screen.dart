@@ -3,6 +3,8 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/product_model.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/components/optimized_image.dart';
+import '../../../core/services/image_optimization_service.dart';
 import '../../cart/bloc/cart_cubit.dart';
 import '../../auth/bloc/auth_bloc.dart';
 
@@ -19,6 +21,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _currentImageIndex = 0;
   int _quantity = 1;
   bool _isProductInfoExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _preloadImages();
+  }
+
+  Future<void> _preloadImages() async {
+    // Preload all product images for faster carousel navigation
+    final imageService = ImageOptimizationService();
+    final imageUrls = widget.product.photos.map((photo) => photo.url).toList();
+    
+    // Preload images in the background
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      imageService.preloadImages(
+        context,
+        imageUrls,
+        size: ImageSize.large,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +64,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         if (state.status == CartStatus.error) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to add to cart: ${state.errorMessage ?? "Unknown error"}'),
+              content: Text(
+                'Failed to add to cart: ${state.errorMessage ?? "Unknown error"}',
+              ),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 3),
             ),
@@ -100,30 +125,28 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   return SizedBox(
                     width: double.infinity,
                     height: double.infinity,
-                    child: Image.network(
-                      imageUrl.url,
+                    child: OptimizedImage(
+                      imageUrl: imageUrl.url,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: AppColors.divider,
-                          child: const Icon(
-                            Icons.image_not_supported,
-                            size: 64,
-                            color: AppColors.body,
+                      size: ImageSize.large, // Use large size for detail images
+                      width: double.infinity,
+                      height: double.infinity,
+                      errorWidget: Container(
+                        color: AppColors.divider,
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          size: 64,
+                          color: AppColors.body,
+                        ),
+                      ),
+                      placeholder: Container(
+                        color: AppColors.divider,
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
                           ),
-                        );
-                      },
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          color: AppColors.divider,
-                          child: const Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
                   );
                 },
@@ -428,7 +451,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         // ),
         trailing: const Icon(Feather.chevron_right, color: AppColors.body),
         onTap: () {
-          // TODO: Navigate to seller profile page
           // This could show seller details, other products, etc.
         },
       ),
@@ -459,46 +481,53 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: BlocBuilder<CartCubit, CartState>(
               builder: (context, cartState) {
                 final isLoading = cartState.actionInProgress;
-                
+
                 return ElevatedButton(
-                  onPressed: isLoading ? null : () async {
-                    if (!(widget.product.inStock ?? true)) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('This product is out of stock.'),
-                            backgroundColor: Colors.orange,
-                          ),
-                        );
-                      }
-                      return;
-                    }
-                    
-                    try {
-                      final authState = context.read<AuthBloc>().state;
-                      if (authState is AuthAuthenticated) {
-                        await context.read<CartCubit>().add(
-                          userData: authState.user,
-                          productId: widget.product.id,
-                          quantity: _quantity,
-                        );
-                        // Success notification will be handled by BlocListener
-                      } else {
-                        throw Exception('User not authenticated');
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Failed to add to cart: $e'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    }
-                  },
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          if (!(widget.product.inStock ?? true)) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'This product is out of stock.',
+                                  ),
+                                  backgroundColor: Colors.orange,
+                                ),
+                              );
+                            }
+                            return;
+                          }
+
+                          final scaffoldMessenger = ScaffoldMessenger.of(context);
+                          try {
+                            final authState = context.read<AuthBloc>().state;
+                            if (authState is AuthAuthenticated) {
+                              await context.read<CartCubit>().add(
+                                userData: authState.user,
+                                productId: widget.product.id,
+                                quantity: _quantity,
+                              );
+                              // Success notification will be handled by BlocListener
+                            } else {
+                              throw Exception('User not authenticated');
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              scaffoldMessenger.showSnackBar(
+                                SnackBar(
+                                  content: Text('Failed to add to cart: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isLoading ? AppColors.primary.withValues(alpha: 0.6) : AppColors.primary,
+                    backgroundColor: isLoading
+                        ? AppColors.primary.withValues(alpha: 0.6)
+                        : AppColors.primary,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -514,7 +543,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             ),
                             SizedBox(width: 8),

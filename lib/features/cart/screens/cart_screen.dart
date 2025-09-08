@@ -7,10 +7,11 @@ import '../bloc/cart_cubit.dart';
 import '../models/cart_models.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../../shared/components/top_search_bar.dart';
+import '../../checkout/screens/checkout_screen.dart';
 
 class CartScreen extends StatefulWidget {
   final VoidCallback? onBackPressed;
-  
+
   const CartScreen({super.key, this.onBackPressed});
 
   @override
@@ -27,7 +28,7 @@ class _CartScreenState extends State<CartScreen> {
     super.initState();
     _searchController = TextEditingController();
     _searchFocusNode = FocusNode();
-    
+
     // Get user data from AuthBloc and load cart
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthAuthenticated) {
@@ -46,9 +47,9 @@ class _CartScreenState extends State<CartScreen> {
     if (_searchQuery.isEmpty) {
       return items;
     }
-    return items.where((item) => 
-      item.name.toLowerCase().contains(_searchQuery)
-    ).toList();
+    return items
+        .where((item) => item.name.toLowerCase().contains(_searchQuery))
+        .toList();
   }
 
   @override
@@ -71,7 +72,8 @@ class _CartScreenState extends State<CartScreen> {
             }
 
             // Check if search has no results
-            if (_searchQuery.isNotEmpty && _getFilteredItems(state.items).isEmpty) {
+            if (_searchQuery.isNotEmpty &&
+                _getFilteredItems(state.items).isEmpty) {
               return _buildNoSearchResults();
             }
 
@@ -79,32 +81,35 @@ class _CartScreenState extends State<CartScreen> {
               children: [
                 // Custom Header
                 _buildHeader(context),
-                
+
                 // Search Bar
-                                    TopSearchBar(
-                      controller: _searchController,
-                      focusNode: _searchFocusNode,
-                      hintText: 'Search in cart...',
-                      onChanged: (value) {
-                        setState(() {
-                          _searchQuery = value.toLowerCase();
-                        });
-                      },
-                      onSearch: () {
-                        // Search is handled by onChanged
-                      },
-                      onClear: () {
-                        _searchController.clear();
-                        setState(() {
-                          _searchQuery = '';
-                        });
-                      },
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    ),
-                
+                TopSearchBar(
+                  controller: _searchController,
+                  focusNode: _searchFocusNode,
+                  hintText: 'Search in cart...',
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value.toLowerCase();
+                    });
+                  },
+                  onSearch: () {
+                    // Search is handled by onChanged
+                  },
+                  onClear: () {
+                    _searchController.clear();
+                    setState(() {
+                      _searchQuery = '';
+                    });
+                  },
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                ),
+
                 // Items Count
                 _buildItemsCount(_getFilteredItems(state.items).length),
-                
+
                 // Cart Items
                 Expanded(
                   child: RefreshIndicator(
@@ -115,7 +120,10 @@ class _CartScreenState extends State<CartScreen> {
                       }
                     },
                     child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       itemCount: _getFilteredItems(state.items).length,
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
@@ -126,13 +134,20 @@ class _CartScreenState extends State<CartScreen> {
                           onQtyChanged: (qty) {
                             final authState = context.read<AuthBloc>().state;
                             if (authState is AuthAuthenticated) {
-                              context.read<CartCubit>().updateQuantity(authState.user, item.id, qty);
+                              context.read<CartCubit>().updateQuantity(
+                                authState.user,
+                                item.id,
+                                qty,
+                              );
                             }
                           },
                           onRemove: () {
                             final authState = context.read<AuthBloc>().state;
                             if (authState is AuthAuthenticated) {
-                              context.read<CartCubit>().remove(authState.user, item.id);
+                              context.read<CartCubit>().remove(
+                                authState.user,
+                                item.id,
+                              );
                             }
                           },
                         );
@@ -140,7 +155,7 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                   ),
                 ),
-                
+
                 // Checkout Section
                 _buildCheckoutSection(state.items, state.summary),
               ],
@@ -181,7 +196,6 @@ class _CartScreenState extends State<CartScreen> {
             onPressed: () async {
               final authState = context.read<AuthBloc>().state;
               if (authState is AuthAuthenticated) {
-                print('🔍 CartScreen: Manual refresh triggered');
                 await context.read<CartCubit>().refresh(authState.user);
               }
             },
@@ -191,7 +205,6 @@ class _CartScreenState extends State<CartScreen> {
       ),
     );
   }
-
 
   Widget _buildItemsCount(int count) {
     return Container(
@@ -209,28 +222,17 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildCheckoutSection(List<CartItem> items, CartSummary? summary) {
-    final total = summary?.total ?? items.fold<double>(0.0, (sum, item) => sum + item.lineTotal);
-    
-    // Debug logging
-    print('🔍 CartScreen: Checkout total calculation:');
-    print('  - Summary: ${summary?.toString()}');
-    print('  - Summary total: ${summary?.total}');
-    print('  - Items count: ${items.length}');
-    print('  - Items details:');
-    for (int i = 0; i < items.length; i++) {
-      final item = items[i];
-      print('    Item $i: ${item.name} - Qty: ${item.quantity}, Price: ${item.price}, LineTotal: ${item.lineTotal}');
-    }
-    print('  - Calculated from items: ${items.fold<double>(0.0, (sum, item) => sum + item.lineTotal)}');
-    print('  - Final total: $total');
-    
+    final total =
+        summary?.total ??
+        items.fold<double>(0.0, (sum, item) => sum + item.lineTotal);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -244,7 +246,17 @@ class _CartScreenState extends State<CartScreen> {
             height: 50,
             child: ElevatedButton(
               onPressed: () {
-                // TODO: Navigate to checkout
+                final authState = context.read<AuthBloc>().state;
+                if (authState is AuthAuthenticated) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CheckoutScreen(
+                        userData: authState.user,
+                      ),
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
@@ -263,18 +275,15 @@ class _CartScreenState extends State<CartScreen> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Taxes & Shipping text
           Text(
-            summary != null 
-              ? 'Total includes taxes & shipping' 
-              : 'Taxes & Shipping calculated at checkout.',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
+            summary != null
+                ? 'Total includes taxes & shipping'
+                : 'Taxes & Shipping calculated at checkout.',
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           ),
         ],
       ),
@@ -385,8 +394,8 @@ class _CartItemCard extends StatelessWidget {
   final bool isLoading;
 
   const _CartItemCard({
-    required this.item, 
-    required this.onQtyChanged, 
+    required this.item,
+    required this.onQtyChanged,
     required this.onRemove,
     this.isLoading = false,
   });
@@ -399,7 +408,7 @@ class _CartItemCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -418,7 +427,7 @@ class _CartItemCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 image: item.thumbnailUrl != null
                     ? DecorationImage(
-                        image: NetworkImage(item.thumbnailUrl!), 
+                        image: NetworkImage(item.thumbnailUrl!),
                         fit: BoxFit.cover,
                         onError: (exception, stackTrace) {
                           // Handle image loading error
@@ -430,9 +439,9 @@ class _CartItemCard extends StatelessWidget {
                   ? Icon(Feather.image, color: Colors.grey[400], size: 32)
                   : null,
             ),
-            
+
             const SizedBox(width: 16),
-            
+
             // Product Details
             Expanded(
               child: Column(
@@ -449,9 +458,9 @@ class _CartItemCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  
+
                   const SizedBox(height: 8),
-                  
+
                   // Price
                   Text(
                     '₹${item.price.toStringAsFixed(0)}',
@@ -461,9 +470,9 @@ class _CartItemCard extends StatelessWidget {
                       color: Colors.green,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 8),
-                  
+
                   // Variants (Size, Color, etc.)
                   if (item.variants.isNotEmpty) ...[
                     Wrap(
@@ -471,13 +480,16 @@ class _CartItemCard extends StatelessWidget {
                       runSpacing: 4,
                       children: item.variants.map((variant) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.grey[100],
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            '${variant.attributeValue ?? ''}',
+                            variant.attributeValue ?? '',
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.black87,
@@ -488,7 +500,7 @@ class _CartItemCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                   ],
-                  
+
                   // Quantity and Remove controls
                   Row(
                     children: [
@@ -498,9 +510,9 @@ class _CartItemCard extends StatelessWidget {
                         onChanged: onQtyChanged,
                         isLoading: isLoading,
                       ),
-                      
+
                       const Spacer(),
-                      
+
                       // Remove Button
                       GestureDetector(
                         onTap: isLoading ? null : onRemove,
@@ -514,7 +526,9 @@ class _CartItemCard extends StatelessWidget {
                               ? const SizedBox(
                                   width: 16,
                                   height: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 )
                               : Icon(
                                   Feather.trash_2,
@@ -540,7 +554,11 @@ class _QuantityStepper extends StatelessWidget {
   final ValueChanged<int> onChanged;
   final bool isLoading;
 
-  const _QuantityStepper({required this.qty, required this.onChanged, this.isLoading = false});
+  const _QuantityStepper({
+    required this.qty,
+    required this.onChanged,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -563,9 +581,9 @@ class _QuantityStepper extends StatelessWidget {
             ),
           ),
         ),
-        
+
         const SizedBox(width: 12),
-        
+
         // Quantity Display
         Text(
           '$qty',
@@ -575,9 +593,9 @@ class _QuantityStepper extends StatelessWidget {
             color: Colors.black,
           ),
         ),
-        
+
         const SizedBox(width: 12),
-        
+
         // Plus Button
         GestureDetector(
           onTap: isLoading ? null : () => onChanged(qty + 1),
@@ -588,15 +606,10 @@ class _QuantityStepper extends StatelessWidget {
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(
-              Feather.plus,
-              size: 16,
-              color: Colors.black87,
-            ),
+            child: Icon(Feather.plus, size: 16, color: Colors.black87),
           ),
         ),
       ],
     );
   }
 }
-

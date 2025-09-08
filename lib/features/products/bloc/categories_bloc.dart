@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../models/product_model.dart';
 import '../repositories/products_repository.dart';
+import '../../../core/utils/app_logger.dart';
 
 // Events
 abstract class CategoriesEvent extends Equatable {
@@ -50,9 +51,8 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
   final ProductsRepository _productsRepository;
 
   CategoriesBloc({required ProductsRepository productsRepository})
-      : _productsRepository = productsRepository,
-        super(CategoriesInitial()) {
-    
+    : _productsRepository = productsRepository,
+      super(CategoriesInitial()) {
     on<LoadCategories>(_onLoadCategories);
     on<RefreshCategories>(_onRefreshCategories);
   }
@@ -63,11 +63,12 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
   ) async {
     try {
       emit(CategoriesLoading());
-      
+
       final categories = await _productsRepository.getCategories();
-      
+
       emit(CategoriesLoaded(categories: categories));
     } catch (e) {
+      AppLogger.error('CategoriesBloc: Error loading categories - $e');
       emit(CategoriesError(e.toString()));
     }
   }
@@ -78,9 +79,9 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
   ) async {
     try {
       emit(CategoriesLoading());
-      
+
       final categories = await _productsRepository.getCategories();
-      
+
       emit(CategoriesLoaded(categories: categories));
     } catch (e) {
       emit(CategoriesError(e.toString()));

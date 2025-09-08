@@ -31,8 +31,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
 
-  // Stream subscription for ProductsBloc state changes
-  StreamSubscription? _productsBlocSubscription;
+  // Removed stream subscription to prevent unnecessary reloads
 
   // Debounced search timer
   Timer? _debounceTimer;
@@ -45,16 +44,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // Register for app lifecycle changes
     WidgetsBinding.instance.addObserver(this);
 
-    // Load featured products using ProductsBloc
-    _loadFeaturedProducts();
-
-    // Load categories using CategoriesBloc
-    context.read<CategoriesBloc>().add(LoadCategories());
-
-    // Load saved location
-    context.read<LocationBloc>().add(const LocationLoadRequested());
-
-    // Initialize promotional banners
+    // Initialize banners immediately (they're hardcoded, so no performance impact)
     _promoBanners = [
       PromoBanner(
         topTitle: 'Upto',
@@ -100,27 +90,44 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         imageBackgroundColor: Colors.yellow.shade100,
       ),
     ];
+
+    // Defer only the heavy API operations
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeData();
+    });
+  }
+
+  void _initializeData() {
+    // Only load data if not already loaded
+    final productsState = context.read<ProductsBloc>().state;
+    if (productsState is! FeaturedProductsLoaded &&
+        productsState is! ProductsLoading) {
+      _loadFeaturedProducts();
+    }
+
+    final categoriesState = context.read<CategoriesBloc>().state;
+    if (categoriesState is! CategoriesLoaded &&
+        categoriesState is! CategoriesLoading) {
+      // Delay other operations slightly
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted) {
+          context.read<CategoriesBloc>().add(LoadCategories());
+        }
+      });
+    }
+
+    // Load location data
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) {
+        context.read<LocationBloc>().add(const LocationLoadRequested());
+      }
+    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    // Set up stream subscription for ProductsBloc state changes
-    _productsBlocSubscription ??= context.read<ProductsBloc>().stream.listen((
-      state,
-    ) {
-      if (mounted && state is ProductsInitial) {
-        _loadFeaturedProducts();
-      }
-    });
-
-    // Check if we need to reload featured products
-    // Only reload if we're in initial state
-    final currentState = context.read<ProductsBloc>().state;
-    if (currentState is ProductsInitial) {
-      _loadFeaturedProducts();
-    }
+    // Removed stream subscription to prevent unnecessary reloads
   }
 
   @override
@@ -138,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // Remove app lifecycle observer
     WidgetsBinding.instance.removeObserver(this);
 
-    _productsBlocSubscription?.cancel();
     _debounceTimer?.cancel();
     _searchController.dispose();
     _searchFocusNode.dispose();
@@ -156,9 +162,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void _loadFeaturedProducts() {
-    // Only load featured products if we're not already loading them
+    // Only load featured products if we're not already loading them or loaded
     final currentState = context.read<ProductsBloc>().state;
-    if (currentState is! ProductsLoading) {
+    if (currentState is! ProductsLoading &&
+        currentState is! FeaturedProductsLoaded &&
+        currentState is! ProductsError) {
       context.read<ProductsBloc>().add(
         LoadFeaturedProducts(filter: ProductFilter(featured: true)),
       );
@@ -442,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   // Promotional banner data
-  late final List<PromoBanner> _promoBanners;
+  List<PromoBanner> _promoBanners = [];
 
   Widget _buildCategoriesSection() {
     return BlocBuilder<CategoriesBloc, CategoriesState>(
@@ -468,7 +476,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               },
             ),
           );
+        } else if (state is CategoriesError) {
+          // Show skeleton on error to maintain layout
+          return const CategoriesSliderSkeleton();
+        } else if (state is CategoriesInitial) {
+          // Trigger loading if not already loading
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              context.read<CategoriesBloc>().add(LoadCategories());
+            }
+          });
+          return const CategoriesSliderSkeleton();
         }
+
         return const SizedBox.shrink();
       },
     );
