@@ -52,7 +52,7 @@ class _SignupScreenState extends State<SignupScreen> {
   void _testNetworkConnectivity() async {
     print('🔍 Starting network connectivity test...');
     final results = await NetworkTest.testConnectivity();
-    
+
     // Show results in a dialog
     showDialog(
       context: context,
@@ -66,7 +66,9 @@ class _SignupScreenState extends State<SignupScreen> {
               Text('Internet: ${results['internet_connectivity'] ? '✅' : '❌'}'),
               Text('DNS Resolution: ${results['dns_resolution'] ? '✅' : '❌'}'),
               Text('Server IP: ${results['server_ip']}'),
-              Text('Server Reachable: ${results['server_reachable'] ? '✅' : '❌'}'),
+              Text(
+                'Server Reachable: ${results['server_reachable'] ? '✅' : '❌'}',
+              ),
               Text('API Endpoint: ${results['api_endpoint'] ? '✅' : '❌'}'),
               const SizedBox(height: 10),
               Text('Base URL: ${results['base_url']}'),
@@ -517,38 +519,38 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
 
-                   const SizedBox(height: 25),
+                  const SizedBox(height: 25),
 
-                   // Network Test Button (Temporary for debugging)
-                   Container(
-                     width: double.infinity,
-                     height: 40,
-                     decoration: BoxDecoration(
-                       color: Colors.orange,
-                       borderRadius: BorderRadius.circular(8),
-                     ),
-                     child: Material(
-                       color: Colors.transparent,
-                       child: InkWell(
-                         onTap: _testNetworkConnectivity,
-                         borderRadius: BorderRadius.circular(8),
-                         child: const Center(
-                           child: Text(
-                             'Test Network Connectivity',
-                             style: TextStyle(
-                               fontSize: 14,
-                               fontWeight: FontWeight.w600,
-                               color: Colors.white,
-                             ),
-                           ),
-                         ),
-                       ),
-                     ),
-                   ),
+                  // Network Test Button (Temporary for debugging)
+                  //  Container(
+                  //    width: double.infinity,
+                  //    height: 40,
+                  //    decoration: BoxDecoration(
+                  //      color: Colors.orange,
+                  //      borderRadius: BorderRadius.circular(8),
+                  //    ),
+                  //    child: Material(
+                  //      color: Colors.transparent,
+                  //      child: InkWell(
+                  //        onTap: _testNetworkConnectivity,
+                  //        borderRadius: BorderRadius.circular(8),
+                  //        child: const Center(
+                  //          child: Text(
+                  //            'Test Network Connectivity',
+                  //            style: TextStyle(
+                  //              fontSize: 14,
+                  //              fontWeight: FontWeight.w600,
+                  //              color: Colors.white,
+                  //            ),
+                  //          ),
+                  //        ),
+                  //      ),
+                  //    ),
+                  //  ),
 
-                   const SizedBox(height: 15),
+                  //  const SizedBox(height: 15),
 
-                   // Already have account
+                  // Already have account
                   Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
