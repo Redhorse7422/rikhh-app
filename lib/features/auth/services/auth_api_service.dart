@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/utils/app_logger.dart';
+import '../models/phone_verification_models.dart';
 
 class AuthApiService {
   final Dio _dio = DioClient.instance;
@@ -97,6 +98,120 @@ class AuthApiService {
             'Response status: ${e.response?.statusCode}',
           );
           AppLogger.auth('Response data: ${e.response?.data}');
+        }
+      }
+      rethrow;
+    }
+  }
+
+  Future<PhoneVerificationResponse> sendPhoneVerificationOtp({
+    required String phoneNumber,
+    String? deviceId,
+  }) async {
+    try {
+      final request = PhoneVerificationRequest(
+        phoneNumber: phoneNumber,
+        deviceId: deviceId,
+      );
+
+      final response = await _dio.post(
+        '/auth/send-phone-verification-otp',
+        data: request.toJson(),
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data is Map<String, dynamic>
+            ? response.data as Map<String, dynamic>
+            : Map<String, dynamic>.from(response.data);
+
+        return PhoneVerificationResponse.fromJson(data);
+      }
+
+      throw Exception('Failed to send OTP: ${response.statusCode}');
+    } catch (e) {
+      if (e is DioException) {
+        if (e.response != null) {
+          AppLogger.auth(
+            'Send OTP Response status: ${e.response?.statusCode}',
+          );
+          AppLogger.auth('Send OTP Response data: ${e.response?.data}');
+        }
+      }
+      rethrow;
+    }
+  }
+
+  Future<VerifyOtpResponse> verifyPhoneOtp({
+    required String phoneNumber,
+    required String otpCode,
+  }) async {
+    try {
+      final request = VerifyOtpRequest(
+        phoneNumber: phoneNumber,
+        otpCode: otpCode,
+      );
+
+      final response = await _dio.post(
+        '/auth/verify-phone-otp',
+        data: request.toJson(),
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data is Map<String, dynamic>
+            ? response.data as Map<String, dynamic>
+            : Map<String, dynamic>.from(response.data);
+
+        return VerifyOtpResponse.fromJson(data);
+      }
+
+      throw Exception('Failed to verify OTP: ${response.statusCode}');
+    } catch (e) {
+      if (e is DioException) {
+        if (e.response != null) {
+          AppLogger.auth(
+            'Verify OTP Response status: ${e.response?.statusCode}',
+          );
+          AppLogger.auth('Verify OTP Response data: ${e.response?.data}');
+        }
+      }
+      rethrow;
+    }
+  }
+
+  Future<ResendOtpResponse> resendPhoneVerificationOtp({
+    required String phoneNumber,
+    String? deviceId,
+  }) async {
+    try {
+      final request = ResendOtpRequest(
+        phoneNumber: phoneNumber,
+        deviceId: deviceId,
+      );
+
+      final response = await _dio.post(
+        '/auth/resend-phone-verification-otp',
+        data: request.toJson(),
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data is Map<String, dynamic>
+            ? response.data as Map<String, dynamic>
+            : Map<String, dynamic>.from(response.data);
+
+        return ResendOtpResponse.fromJson(data);
+      }
+
+      throw Exception('Failed to resend OTP: ${response.statusCode}');
+    } catch (e) {
+      if (e is DioException) {
+        if (e.response != null) {
+          AppLogger.auth(
+            'Resend OTP Response status: ${e.response?.statusCode}',
+          );
+          AppLogger.auth('Resend OTP Response data: ${e.response?.data}');
         }
       }
       rethrow;

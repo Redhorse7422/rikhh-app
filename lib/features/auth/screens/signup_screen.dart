@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import '../../../core/theme/app_colors.dart';
+import '../bloc/auth_bloc.dart';
+import 'phone_verification_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -13,6 +16,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _isPasswordVisible = false;
@@ -23,6 +27,7 @@ class _SignupScreenState extends State<SignupScreen> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -146,6 +151,44 @@ class _SignupScreenState extends State<SignupScreen> {
                       r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                     ).hasMatch(value)) {
                       return 'Please enter a valid email';
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 24),
+
+                // Phone Number Field
+                TextFormField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    labelText: 'Phone Number',
+                    hintText: '+919876543210',
+                    prefixIcon: const Icon(Feather.phone, color: AppColors.body),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.divider),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.divider),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: AppColors.primary,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your phone number';
+                    }
+                    // Basic Indian phone number validation
+                    if (!RegExp(r'^\+91[6-9]\d{9}$').hasMatch(value)) {
+                      return 'Please enter a valid Indian phone number (+91XXXXXXXXXX)';
                     }
                     return null;
                   },
@@ -311,7 +354,26 @@ class _SignupScreenState extends State<SignupScreen> {
                       onTap: () {
                         if (_formKey.currentState!.validate() &&
                             _agreeToTerms) {
-                          // Handle sign up
+                          // Navigate to phone verification
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => PhoneVerificationScreen(
+                                phoneNumber: _phoneController.text.trim(),
+                                deviceId: 'flutter-${DateTime.now().millisecondsSinceEpoch}',
+                              ),
+                            ),
+                          ).then((isVerified) {
+                            if (isVerified == true) {
+                              // Phone verified, proceed with registration
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Phone verified! You can now complete registration.'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              // Here you would typically proceed with the actual registration
+                            }
+                          });
                         } else if (!_agreeToTerms) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(

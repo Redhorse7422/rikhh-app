@@ -29,3 +29,48 @@ class AuthError extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+
+class PhoneVerificationOtpSent extends AuthState {
+  final String otpId;
+  final String phoneNumber;
+  final DateTime expiresAt;
+
+  const PhoneVerificationOtpSent({
+    required this.otpId,
+    required this.phoneNumber,
+    required this.expiresAt,
+  });
+
+  @override
+  List<Object?> get props => [otpId, phoneNumber, expiresAt];
+}
+
+class PhoneVerificationOtpVerified extends AuthState {
+  final String phoneNumber;
+  final bool isValid;
+
+  const PhoneVerificationOtpVerified({
+    required this.phoneNumber,
+    required this.isValid,
+  });
+
+  @override
+  List<Object?> get props => [phoneNumber, isValid];
+}
+
+class PhoneVerificationOtpResent extends AuthState {
+  final String otpId;
+  final String phoneNumber;
+  final DateTime expiresAt;
+
+  const PhoneVerificationOtpResent({
+    required this.otpId,
+    required this.phoneNumber,
+    required this.expiresAt,
+  });
+
+  @override
+  List<Object?> get props => [otpId, phoneNumber, expiresAt];
+}
+
+class PhoneVerificationReset extends AuthState {}

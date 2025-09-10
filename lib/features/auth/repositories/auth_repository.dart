@@ -3,6 +3,7 @@ import 'dart:convert';
 import '../../../core/app_config.dart';
 import '../../../core/network/dio_client.dart';
 import '../services/auth_api_service.dart';
+import '../models/phone_verification_models.dart';
 
 class AuthRepository {
   AuthApiService? _api;
@@ -103,5 +104,35 @@ class AuthRepository {
     DioClient.updateAuthToken(result.token);
 
     return {'token': result.token, 'refreshToken': result.refreshToken};
+  }
+
+  Future<PhoneVerificationResponse> sendPhoneVerificationOtp({
+    required String phoneNumber,
+    String? deviceId,
+  }) async {
+    return await api.sendPhoneVerificationOtp(
+      phoneNumber: phoneNumber,
+      deviceId: deviceId,
+    );
+  }
+
+  Future<VerifyOtpResponse> verifyPhoneOtp({
+    required String phoneNumber,
+    required String otpCode,
+  }) async {
+    return await api.verifyPhoneOtp(
+      phoneNumber: phoneNumber,
+      otpCode: otpCode,
+    );
+  }
+
+  Future<ResendOtpResponse> resendPhoneVerificationOtp({
+    required String phoneNumber,
+    String? deviceId,
+  }) async {
+    return await api.resendPhoneVerificationOtp(
+      phoneNumber: phoneNumber,
+      deviceId: deviceId,
+    );
   }
 }
