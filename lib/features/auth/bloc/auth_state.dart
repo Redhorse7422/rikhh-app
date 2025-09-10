@@ -74,3 +74,12 @@ class PhoneVerificationOtpResent extends AuthState {
 }
 
 class PhoneVerificationReset extends AuthState {}
+
+class AuthRegistrationSuccess extends AuthState {
+  final Map<String, dynamic> user;
+  
+  const AuthRegistrationSuccess({required this.user});
+
+  @override
+  List<Object?> get props => [user];
+}

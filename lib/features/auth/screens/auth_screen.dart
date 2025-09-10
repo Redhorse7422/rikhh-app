@@ -66,10 +66,10 @@ class _AuthScreenState extends State<AuthScreen> {
               // Get Started Button
               Container(
                 width: double.infinity,
-                height: 56,
+                height: 48,
                 decoration: BoxDecoration(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(30),
                 ),
                 child: Material(
                   color: Colors.transparent,
@@ -78,7 +78,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       // Navigate to main auth screen
                       context.push('/auth-main');
                     },
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(30),
                     child: Center(
                       child: Text(
                         'Get Started',

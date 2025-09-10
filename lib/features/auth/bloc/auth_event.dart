@@ -56,13 +56,35 @@ class PhoneOtpResendRequested extends AuthEvent {
   final String phoneNumber;
   final String? deviceId;
 
-  const PhoneOtpResendRequested({
-    required this.phoneNumber,
-    this.deviceId,
-  });
+  const PhoneOtpResendRequested({required this.phoneNumber, this.deviceId});
 
   @override
   List<Object?> get props => [phoneNumber, deviceId];
 }
 
 class PhoneVerificationResetRequested extends AuthEvent {}
+
+class AuthRegistrationRequested extends AuthEvent {
+  final String firstName;
+  final String lastName;
+  final String email;
+  final String phoneNumber;
+  final String password;
+
+  const AuthRegistrationRequested({
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+    required this.phoneNumber,
+    required this.password,
+  });
+
+  @override
+  List<Object?> get props => [
+    firstName,
+    lastName,
+    email,
+    phoneNumber,
+    password,
+  ];
+}

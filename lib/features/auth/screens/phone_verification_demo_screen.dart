@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/app_colors.dart';
-import '../bloc/auth_bloc.dart';
+import '../../../shared/components/phone_input_field.dart';
 import 'phone_verification_screen.dart';
 
 class PhoneVerificationDemoScreen extends StatefulWidget {
   const PhoneVerificationDemoScreen({super.key});
 
   @override
-  State<PhoneVerificationDemoScreen> createState() => _PhoneVerificationDemoScreenState();
+  State<PhoneVerificationDemoScreen> createState() =>
+      _PhoneVerificationDemoScreenState();
 }
 
-class _PhoneVerificationDemoScreenState extends State<PhoneVerificationDemoScreen> {
+class _PhoneVerificationDemoScreenState
+    extends State<PhoneVerificationDemoScreen> {
   final _phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
@@ -23,23 +24,25 @@ class _PhoneVerificationDemoScreenState extends State<PhoneVerificationDemoScree
 
   void _startPhoneVerification() {
     if (_formKey.currentState!.validate()) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => PhoneVerificationScreen(
-            phoneNumber: _phoneController.text.trim(),
-            deviceId: 'demo-${DateTime.now().millisecondsSinceEpoch}',
-          ),
-        ),
-      ).then((isVerified) {
-        if (isVerified == true) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Phone verification completed successfully!'),
-              backgroundColor: Colors.green,
+      Navigator.of(context)
+          .push(
+            MaterialPageRoute(
+              builder: (context) => PhoneVerificationScreen(
+                phoneNumber: _phoneController.text.trim(),
+                deviceId: 'demo-${DateTime.now().millisecondsSinceEpoch}',
+              ),
             ),
-          );
-        }
-      });
+          )
+          .then((isVerified) {
+            if (isVerified == true) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Phone verification completed successfully!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          });
     }
   }
 
@@ -76,47 +79,14 @@ class _PhoneVerificationDemoScreenState extends State<PhoneVerificationDemoScree
 
                 Text(
                   'Test the phone verification flow with a valid Indian phone number',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.body,
-                  ),
+                  style: TextStyle(fontSize: 16, color: AppColors.body),
                 ),
 
                 const SizedBox(height: 48),
 
                 // Phone Number Input
-                TextFormField(
+                PhoneInputField(
                   controller: _phoneController,
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
-                    labelText: 'Phone Number',
-                    hintText: '+919876543210',
-                    prefixIcon: const Icon(Icons.phone, color: AppColors.body),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppColors.divider),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppColors.divider),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: AppColors.primary,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a phone number';
-                    }
-                    if (!RegExp(r'^\+91[6-9]\d{9}$').hasMatch(value)) {
-                      return 'Please enter a valid Indian phone number (+91XXXXXXXXXX)';
-                    }
-                    return null;
-                  },
                 ),
 
                 const SizedBox(height: 32),
@@ -154,7 +124,7 @@ class _PhoneVerificationDemoScreenState extends State<PhoneVerificationDemoScree
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -186,9 +156,11 @@ class _PhoneVerificationDemoScreenState extends State<PhoneVerificationDemoScree
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                    border: Border.all(
+                      color: Colors.blue.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,10 +186,7 @@ class _PhoneVerificationDemoScreenState extends State<PhoneVerificationDemoScree
                         '3. You will be redirected to the verification screen\n'
                         '4. Enter the 6-digit OTP sent to your phone\n'
                         '5. The OTP will be verified automatically',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.blue[700],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.blue[700]),
                       ),
                     ],
                   ),
@@ -235,10 +204,7 @@ class _PhoneVerificationDemoScreenState extends State<PhoneVerificationDemoScree
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: 14,
-          color: AppColors.heading,
-        ),
+        style: TextStyle(fontSize: 14, color: AppColors.heading),
       ),
     );
   }

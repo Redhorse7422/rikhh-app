@@ -120,10 +120,7 @@ class AuthRepository {
     required String phoneNumber,
     required String otpCode,
   }) async {
-    return await api.verifyPhoneOtp(
-      phoneNumber: phoneNumber,
-      otpCode: otpCode,
-    );
+    return await api.verifyPhoneOtp(phoneNumber: phoneNumber, otpCode: otpCode);
   }
 
   Future<ResendOtpResponse> resendPhoneVerificationOtp({
@@ -134,5 +131,37 @@ class AuthRepository {
       phoneNumber: phoneNumber,
       deviceId: deviceId,
     );
+  }
+
+  Future<Map<String, dynamic>> register({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String phoneNumber,
+    required String password,
+    bool rememberMe = true,
+  }) async {
+    final result = await api.register(
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      phoneNumber: phoneNumber,
+      password: password,
+    );
+
+    final prefs = await SharedPreferences.getInstance();
+    if (rememberMe && result.token != 'registration_success_token') {
+      await prefs.setString(AppConfig.tokenKey, result.token);
+      await prefs.setString(AppConfig.userKey, jsonEncode(result.user));
+
+      // Save refresh token if available
+      if (result.refreshToken != null) {
+        await prefs.setString(AppConfig.refreshTokenKey, result.refreshToken!);
+      }
+
+      DioClient.updateAuthToken(result.token);
+    }
+
+    return result.user;
   }
 }

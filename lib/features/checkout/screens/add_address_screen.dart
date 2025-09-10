@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rikhh_app/features/checkout/bloc/checkout_state.dart';
 import '../../../shared/components/checkout_scaffold.dart';
+import '../../../shared/components/phone_input_field.dart';
 import '../bloc/checkout_cubit.dart';
 import '../models/checkout_models.dart';
 
@@ -191,19 +192,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
+                        PhoneInputField(
                           controller: _phoneController,
-                          decoration: const InputDecoration(
-                            labelText: 'Phone Number',
-                            border: OutlineInputBorder(),
-                          ),
-                          keyboardType: TextInputType.phone,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter phone number';
-                            }
-                            return null;
-                          },
                         ),
                         const SizedBox(height: 24),
                         _buildSectionHeader('Address Information'),

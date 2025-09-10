@@ -147,21 +147,41 @@ class DioClient {
 class _LoggingInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    if (options.path.contains('confirm-order')) {
-      AppLogger.network('Request to ${options.path}');
-      AppLogger.network('Request data: ${options.data}');
-      AppLogger.network('Request headers: ${options.headers}');
-    }
+    print('🌐 NETWORK REQUEST:');
+    print('🌐 URL: ${options.uri}');
+    print('🌐 Method: ${options.method}');
+    print('🌐 Headers: ${options.headers}');
+    print('🌐 Data: ${options.data}');
+    print('🌐 Timeout: ${options.connectTimeout}');
+    
+    AppLogger.network('Request to ${options.path}');
+    AppLogger.network('Request data: ${options.data}');
+    AppLogger.network('Request headers: ${options.headers}');
     handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
+    print('🌐 NETWORK RESPONSE:');
+    print('🌐 Status: ${response.statusCode}');
+    print('🌐 Headers: ${response.headers}');
+    print('🌐 Data: ${response.data}');
+    
+    AppLogger.network('Response status: ${response.statusCode}');
+    AppLogger.network('Response data: ${response.data}');
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
+    print('🌐 NETWORK ERROR:');
+    print('🌐 Type: ${err.type}');
+    print('🌐 Message: ${err.message}');
+    print('🌐 URL: ${err.requestOptions.uri}');
+    print('🌐 Status Code: ${err.response?.statusCode}');
+    print('🌐 Response Data: ${err.response?.data}');
+    
+    AppLogger.network('Network error: ${err.type} - ${err.message}');
     handler.next(err);
   }
 }

@@ -17,7 +17,8 @@ class PhoneVerificationScreen extends StatefulWidget {
   });
 
   @override
-  State<PhoneVerificationScreen> createState() => _PhoneVerificationScreenState();
+  State<PhoneVerificationScreen> createState() =>
+      _PhoneVerificationScreenState();
 }
 
 class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
@@ -139,7 +140,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
               _startCountdown(300); // 5 minutes
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('OTP sent to ${_formatPhoneNumber(state.phoneNumber)}'),
+                  content: Text(
+                    'OTP sent to ${_formatPhoneNumber(state.phoneNumber)}',
+                  ),
                   backgroundColor: AppColors.primary,
                 ),
               );
@@ -147,7 +150,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
               _startCountdown(300); // 5 minutes
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('OTP resent to ${_formatPhoneNumber(state.phoneNumber)}'),
+                  content: Text(
+                    'OTP resent to ${_formatPhoneNumber(state.phoneNumber)}',
+                  ),
                   backgroundColor: AppColors.primary,
                 ),
               );
@@ -249,7 +254,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   BlocBuilder<AuthBloc, AuthState>(
                     builder: (context, state) {
                       final isLoading = state is AuthLoading;
-                      
+
                       return Container(
                         width: double.infinity,
                         height: 56,
@@ -298,7 +303,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: _canResend ? AppColors.primary : AppColors.body,
+                          color: _canResend
+                              ? AppColors.primary
+                              : AppColors.body,
                         ),
                       ),
                     ),
@@ -310,16 +317,12 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          Feather.info,
-                          color: AppColors.primary,
-                          size: 20,
-                        ),
+                        Icon(Feather.info, color: AppColors.primary, size: 20),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(

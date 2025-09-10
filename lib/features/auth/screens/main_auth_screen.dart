@@ -216,7 +216,7 @@ class _MainAuthScreenState extends State<MainAuthScreen> {
                 // Sign Up Button
                 Expanded(
                   child: Container(
-                    height: 56,
+                    height: 48,
                     decoration: BoxDecoration(
                       color: const Color(0xFFF2F4F7),
                       borderRadius: BorderRadius.circular(50),
@@ -251,7 +251,7 @@ class _MainAuthScreenState extends State<MainAuthScreen> {
                 // Login Button
                 Expanded(
                   child: Container(
-                    height: 56,
+                    height: 48,
                     decoration: BoxDecoration(
                       color: const Color(0xFFF2F4F7),
                       borderRadius: BorderRadius.circular(50),
