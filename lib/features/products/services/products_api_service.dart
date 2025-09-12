@@ -5,9 +5,13 @@ import '../models/product_model.dart';
 
 part 'products_api_service.g.dart';
 
-@RestApi(baseUrl: "http://13.201.5.235:3001/api")
+@RestApi(baseUrl: "")
 abstract class ProductsApiService {
-  factory ProductsApiService(Dio dio, {String? baseUrl, ParseErrorLogger? errorLogger}) = _ProductsApiService;
+  factory ProductsApiService(
+    Dio dio, {
+    String? baseUrl,
+    ParseErrorLogger? errorLogger,
+  }) = _ProductsApiService;
 
   @GET('/v1/products/all')
   Future<ProductsResponse> getProducts({

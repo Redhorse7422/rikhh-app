@@ -7,6 +7,7 @@ import '../../features/cart/screens/cart_screen.dart';
 import '../../features/cart/bloc/cart_cubit.dart';
 import '../../features/auth/bloc/auth_bloc.dart';
 import '../../features/orders/screens/orders_screen.dart';
+import '../../features/orders/bloc/orders_bloc.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../theme/app_colors.dart';
 
@@ -41,7 +42,10 @@ class _MainNavigationState extends State<MainNavigation> {
           });
         },
       ),
-      const OrdersScreen(),
+      BlocProvider(
+        create: (context) => OrdersBloc(),
+        child: const OrdersScreen(),
+      ),
       const ProfileScreen(),
     ];
 

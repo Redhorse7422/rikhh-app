@@ -42,7 +42,7 @@ class ProductsRepositoryImpl implements ProductsRepository {
   final ProductsApiService _apiService;
 
   ProductsRepositoryImpl()
-    : _apiService = ProductsApiService(DioClient.instance);
+    : _apiService = ProductsApiService(DioClient.instance, baseUrl: AppConfig.baseUrl);
 
   // Helper functions for parsing
   double _asDouble(dynamic value, {double fallback = 0.0}) {

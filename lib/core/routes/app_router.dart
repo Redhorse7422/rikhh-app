@@ -10,6 +10,7 @@ import '../../features/auth/screens/signup_screen.dart';
 import '../../features/products/screens/products_screen.dart';
 import '../../features/products/screens/product_detail_screen.dart';
 import '../../features/checkout/screens/checkout_screen.dart';
+import '../../features/orders/screens/order_detail_screen.dart';
 
 class AppRouter {
   static const String startup = '/';
@@ -142,9 +143,7 @@ class AppRouter {
         name: 'orderDetail',
         builder: (context, state) {
           final orderId = state.pathParameters['id'];
-          return Scaffold(
-            body: Center(child: Text('Order Detail Screen - ID: $orderId')),
-          );
+          return OrderDetailScreen(orderId: orderId!);
         },
       ),
 
