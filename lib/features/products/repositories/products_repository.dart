@@ -485,7 +485,16 @@ class ProductsRepositoryImpl implements ProductsRepository {
           final name = categoryJson['name']?.toString();
           final description =
               categoryJson['description']?.toString() ?? 'No description';
-          final image = categoryJson['image']?.toString();
+          
+          // Extract image URL from thumbnailImage.url or fallback to image
+          String? image;
+          if (categoryJson['thumbnailImage'] != null && 
+              categoryJson['thumbnailImage']['url'] != null) {
+            image = categoryJson['thumbnailImage']['url'].toString();
+          } else {
+            image = categoryJson['image']?.toString();
+          }
+          
           final isActive = categoryJson['isActive'] as bool? ?? true;
 
           // Skip categories with null or empty names

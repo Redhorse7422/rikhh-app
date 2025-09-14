@@ -7,6 +7,12 @@ import '../../../features/auth/bloc/auth_bloc.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../shared/components/optimized_image.dart';
 import '../../../core/services/image_optimization_service.dart';
+import 'edit_profile_screen.dart';
+import 'address_list_screen.dart';
+import 'refer_a_friend_screen.dart';
+import 'wallet_screen.dart';
+import '../bloc/profile_bloc.dart';
+import '../../../features/checkout/bloc/checkout_cubit.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -114,13 +120,16 @@ class ProfileScreen extends StatelessWidget {
               ),
 
               // Edit Icon
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+              GestureDetector(
+                onTap: () => _navigateToEditProfile(context),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Feather.edit_3, size: 20, color: AppColors.primary),
                 ),
-                child: Icon(Feather.edit_3, size: 20, color: AppColors.primary),
               ),
             ],
           ),
@@ -138,11 +147,11 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildProfileOptionsList(BuildContext context) {
     final profileOptions = [
-      {'icon': Feather.user, 'title': 'Edit Profile', 'onTap': () {}},
+      {'icon': Feather.user, 'title': 'Edit Profile', 'onTap': () => _navigateToEditProfile(context)},
       {'icon': Feather.lock, 'title': 'Account Security', 'onTap': () {}},
-      {'icon': Feather.users, 'title': 'Refer a Friend', 'onTap': () {}},
-      {'icon': Feather.credit_card, 'title': 'Payment Methods', 'onTap': () {}},
-      {'icon': Feather.map_pin, 'title': 'Addresses', 'onTap': () {}},
+      {'icon': Feather.users, 'title': 'Refer a Friend', 'onTap': () => _navigateToReferAFriend(context)},
+      {'icon': Feather.credit_card, 'title': 'My Wallet', 'onTap': () => _navigateToWallet(context)},
+      {'icon': Feather.map_pin, 'title': 'Addresses', 'onTap': () => _navigateToAddressList(context)},
       {'icon': Feather.shield, 'title': 'Privacy Policy', 'onTap': () {}},
       {
         'icon': Feather.file_text,
@@ -214,6 +223,44 @@ class ProfileScreen extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  void _navigateToEditProfile(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => ProfileBloc(),
+          child: const EditProfileScreen(),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToAddressList(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => CheckoutCubit(),
+          child: const AddressListScreen(),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToReferAFriend(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const ReferAFriendScreen(),
+      ),
+    );
+  }
+
+  void _navigateToWallet(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const WalletScreen(),
       ),
     );
   }

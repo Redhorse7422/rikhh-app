@@ -366,7 +366,11 @@ class ProductCategory extends Equatable {
       id: json['id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
       description: json['description']?.toString(),
-      image: json['image']?.toString(),
+      image:
+          json['thumbnailImage'] != null &&
+              json['thumbnailImage']['url'] != null
+          ? json['thumbnailImage']['url'].toString()
+          : json['image']?.toString(),
       productCount: json['productCount'] ?? 0,
       isActive:
           Product._parseBool(json['isActive']) ??

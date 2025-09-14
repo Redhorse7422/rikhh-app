@@ -28,32 +28,47 @@ class OrderModel extends Equatable {
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
+    final id = json['id']?.toString() ?? '';
+    final userId = json['userId']?.toString() ?? '';
+    final guestId = json['guestId']?.toString();
+    final orderNumber = json['orderNumber']?.toString() ?? '';
+    final status = json['status']?.toString() ?? '';
+    final paymentStatus = json['paymentStatus']?.toString() ?? '';
+    final totalAmount = json['totalAmount'] is num
+        ? (json['totalAmount'] as num).toDouble()
+        : double.tryParse(json['totalAmount']?.toString() ?? '0') ?? 0.0;
+
+    final items =
+        (json['items'] as List?)?.map((item) {
+          return OrderItem.fromJson(item);
+        }).toList() ??
+        [];
+
+    final statusHistory =
+        (json['statusHistory'] as List?)?.map((status) {
+          return OrderStatusHistory.fromJson(status);
+        }).toList() ??
+        [];
+
+    final createdAt =
+        DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
+        DateTime.now();
+    final updatedAt =
+        DateTime.tryParse(json['updatedAt']?.toString() ?? '') ??
+        DateTime.now();
+
     return OrderModel(
-      id: json['id']?.toString() ?? '',
-      userId: json['userId']?.toString() ?? '',
-      guestId: json['guestId']?.toString(),
-      orderNumber: json['orderNumber']?.toString() ?? '',
-      status: json['status']?.toString() ?? '',
-      paymentStatus: json['paymentStatus']?.toString() ?? '',
-      totalAmount: json['totalAmount'] is num
-          ? (json['totalAmount'] as num).toDouble()
-          : double.tryParse(json['totalAmount']?.toString() ?? '0') ?? 0.0,
-      items:
-          (json['items'] as List?)
-              ?.map((item) => OrderItem.fromJson(item))
-              .toList() ??
-          [],
-      statusHistory:
-          (json['statusHistory'] as List?)
-              ?.map((status) => OrderStatusHistory.fromJson(status))
-              .toList() ??
-          [],
-      createdAt:
-          DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
-          DateTime.now(),
-      updatedAt:
-          DateTime.tryParse(json['updatedAt']?.toString() ?? '') ??
-          DateTime.now(),
+      id: id,
+      userId: userId,
+      guestId: guestId,
+      orderNumber: orderNumber,
+      status: status,
+      paymentStatus: paymentStatus,
+      totalAmount: totalAmount,
+      items: items,
+      statusHistory: statusHistory,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 
@@ -184,27 +199,54 @@ class OrderStatusHistory extends Equatable {
 class OrdersResponse extends Equatable {
   final bool success;
   final List<OrderModel> data;
+  final int total;
+  final int page;
+  final int limit;
 
-  const OrdersResponse({required this.success, required this.data});
+  const OrdersResponse({
+    required this.success,
+    required this.data,
+    required this.total,
+    required this.page,
+    required this.limit,
+  });
 
   factory OrdersResponse.fromJson(Map<String, dynamic> json) {
+    final dataObject = json['data'] as Map<String, dynamic>?;
+
+    final dataList = dataObject?['data'] as List?;
+
     return OrdersResponse(
       success: json['success'] == true,
       data:
-          (json['data'] as List?)
-              ?.map((order) => OrderModel.fromJson(order))
-              .toList() ??
+          dataList?.map((order) {
+            return OrderModel.fromJson(order);
+          }).toList() ??
           [],
+      total: dataObject?['total'] is num
+          ? (dataObject!['total'] as num).toInt()
+          : 0,
+      page: dataObject?['page'] is num
+          ? (dataObject!['page'] as num).toInt()
+          : 1,
+      limit: dataObject?['limit'] is num
+          ? (dataObject!['limit'] as num).toInt()
+          : 10,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'success': success,
-      'data': data.map((order) => order.toJson()).toList(),
+      'data': {
+        'data': data.map((order) => order.toJson()).toList(),
+        'total': total,
+        'page': page,
+        'limit': limit,
+      },
     };
   }
 
   @override
-  List<Object?> get props => [success, data];
+  List<Object?> get props => [success, data, total, page, limit];
 }

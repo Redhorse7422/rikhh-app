@@ -83,3 +83,29 @@ class AuthRegistrationSuccess extends AuthState {
   @override
   List<Object?> get props => [user];
 }
+
+class PasswordResetOtpSent extends AuthState {
+  final String otpId;
+  final String phoneNumber;
+  final DateTime expiresAt;
+
+  const PasswordResetOtpSent({
+    required this.otpId,
+    required this.phoneNumber,
+    required this.expiresAt,
+  });
+
+  @override
+  List<Object?> get props => [otpId, phoneNumber, expiresAt];
+}
+
+class PasswordResetSuccess extends AuthState {
+  final String message;
+
+  const PasswordResetSuccess({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class PasswordResetReset extends AuthState {}

@@ -22,7 +22,7 @@ class OrderItemDetail extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -71,9 +71,9 @@ class OrderItemDetail extends StatelessWidget {
                     ),
                   ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           // Product Details
           Expanded(
             child: Column(
@@ -90,22 +90,25 @@ class OrderItemDetail extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 // Quantity
                 _buildDetailRow('QTY', '${item.quantity}'),
-                
+
                 // Variants
-                ...item.selectedVariants.map((variant) => 
-                  _buildDetailRow(variant.attributeName, variant.variantValue)
+                ...item.selectedVariants.map(
+                  (variant) => _buildDetailRow(
+                    variant.attributeName,
+                    variant.variantValue,
+                  ),
                 ),
-                
+
                 // Shop Name
                 _buildDetailRow('Shop', shopName),
-                
+
                 const SizedBox(height: 8),
-                
+
                 // Price
                 Text(
                   'Price: ₹${item.unitPrice.toStringAsFixed(0)}',
@@ -130,10 +133,7 @@ class OrderItemDetail extends StatelessWidget {
         children: [
           Text(
             '$label: ',
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.body,
-            ),
+            style: const TextStyle(fontSize: 14, color: AppColors.body),
           ),
           Text(
             value,

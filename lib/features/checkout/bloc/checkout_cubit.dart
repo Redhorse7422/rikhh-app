@@ -133,6 +133,134 @@ class CheckoutCubit extends Cubit<CheckoutState> {
     }
   }
 
+  /// Update address
+  Future<void> updateAddress(
+    Map<String, dynamic> userData,
+    String addressId,
+    Address address,
+  ) async {
+    if (_isOperationInProgress) {
+      return;
+    }
+
+    _isOperationInProgress = true;
+    emit(state.copyWith(isOperationInProgress: true));
+
+    try {
+      final updatedAddress = await _apiService.updateAddress(
+        userData,
+        addressId,
+        address,
+      );
+
+      final updatedAddresses = state.addresses.map((addr) {
+        return addr.id == addressId ? updatedAddress : addr;
+      }).toList();
+
+      emit(
+        state.copyWith(
+          addresses: updatedAddresses,
+          isOperationInProgress: false,
+          errorMessage: null,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          isOperationInProgress: false,
+          errorMessage: e.toString(),
+        ),
+      );
+    } finally {
+      _isOperationInProgress = false;
+    }
+  }
+
+  /// Delete address
+  Future<void> deleteAddress(
+    Map<String, dynamic> userData,
+    String addressId,
+  ) async {
+    if (_isOperationInProgress) {
+      return;
+    }
+
+    _isOperationInProgress = true;
+    emit(state.copyWith(isOperationInProgress: true));
+
+    try {
+      await _apiService.deleteAddress(userData, addressId);
+
+      final updatedAddresses = state.addresses
+          .where((addr) => addr.id != addressId)
+          .toList();
+
+      emit(
+        state.copyWith(
+          addresses: updatedAddresses,
+          isOperationInProgress: false,
+          errorMessage: null,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          isOperationInProgress: false,
+          errorMessage: e.toString(),
+        ),
+      );
+    } finally {
+      _isOperationInProgress = false;
+    }
+  }
+
+  /// Set address as default
+  Future<void> setDefaultAddress(
+    Map<String, dynamic> userData,
+    String addressId,
+  ) async {
+    if (_isOperationInProgress) {
+      return;
+    }
+
+    _isOperationInProgress = true;
+    emit(state.copyWith(isOperationInProgress: true));
+
+    try {
+      final updatedAddress = await _apiService.setDefaultAddress(
+        userData,
+        addressId,
+      );
+
+      final updatedAddresses = state.addresses.map((addr) {
+        if (addr.id == addressId) {
+          return updatedAddress;
+        } else if (addr.type == updatedAddress.type) {
+          // Remove default status from other addresses of the same type
+          return addr.copyWith(isDefault: false);
+        }
+        return addr;
+      }).toList();
+
+      emit(
+        state.copyWith(
+          addresses: updatedAddresses,
+          isOperationInProgress: false,
+          errorMessage: null,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          isOperationInProgress: false,
+          errorMessage: e.toString(),
+        ),
+      );
+    } finally {
+      _isOperationInProgress = false;
+    }
+  }
+
   /// Checkout Flow
 
   /// Initiate checkout
@@ -355,6 +483,20 @@ class CheckoutCubit extends Cubit<CheckoutState> {
         notes: notes,
         couponCode: couponCode,
       );
+
+      // Validate that we have a proper order response
+      if (order.orderId.isEmpty || order.orderNumber.isEmpty) {
+        throw Exception(
+          'Invalid order response: Missing order ID or order number',
+        );
+      }
+
+      // Only proceed if order has valid data
+      if (order.status.isEmpty) {
+        throw Exception('Invalid order response: Missing order status');
+      }
+      // Add a small delay to ensure order is processed on backend
+      await Future.delayed(const Duration(seconds: 2));
 
       // Clear the cart when order is successfully confirmed
       _cartCubit?.reset();

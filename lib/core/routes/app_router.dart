@@ -7,6 +7,8 @@ import '../navigation/main_navigation.dart';
 import '../../features/auth/screens/main_auth_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/signup_screen.dart';
+import '../../features/auth/screens/password_reset_request_screen.dart';
+import '../../features/auth/screens/password_reset_confirm_screen.dart';
 import '../../features/products/screens/products_screen.dart';
 import '../../features/products/screens/product_detail_screen.dart';
 import '../../features/checkout/screens/checkout_screen.dart';
@@ -18,6 +20,8 @@ class AppRouter {
   static const String home = '/home';
   static const String login = '/login';
   static const String register = '/register';
+  static const String passwordResetRequest = '/password-reset-request';
+  static const String passwordResetConfirm = '/password-reset-confirm';
   static const String products = '/products';
   static const String productDetail = '/product/:id';
   static const String cart = '/cart';
@@ -90,6 +94,27 @@ class AppRouter {
         path: register,
         name: 'register',
         builder: (context, state) => const SignupScreen(),
+      ),
+
+      // Password Reset Routes
+      GoRoute(
+        path: passwordResetRequest,
+        name: 'password-reset-request',
+        builder: (context, state) => const PasswordResetRequestScreen(),
+      ),
+
+      GoRoute(
+        path: passwordResetConfirm,
+        name: 'password-reset-confirm',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final phoneNumber = extra?['phoneNumber'] as String? ?? '';
+          final userType = extra?['userType'] as String? ?? 'buyer';
+          return PasswordResetConfirmScreen(
+            phoneNumber: phoneNumber,
+            userType: userType,
+          );
+        },
       ),
 
       // Product Routes

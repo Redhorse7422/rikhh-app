@@ -8,7 +8,7 @@ class AppConfig {
   // If true, prefer using LAN IP for development (for physical devices)
   static const bool useLanIpInDev = false;
   // Replace with your machine's LAN IP when useLanIpInDev is true
-  static const String devLanIp = '172.31.80.1';
+  static const String devLanIp = '192.168.100.78';
 
   // API Configuration
   static String get baseUrl {

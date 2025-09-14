@@ -4,6 +4,7 @@ import '../../../core/app_config.dart';
 import '../../../core/network/dio_client.dart';
 import '../services/auth_api_service.dart';
 import '../models/phone_verification_models.dart';
+import '../models/password_reset_models.dart';
 
 class AuthRepository {
   AuthApiService? _api;
@@ -19,6 +20,30 @@ class AuthRepository {
     bool rememberMe = true,
   }) async {
     final result = await api.login(email: email, password: password);
+
+    // Save token and user data
+    final prefs = await SharedPreferences.getInstance();
+    if (rememberMe) {
+      await prefs.setString(AppConfig.tokenKey, result.token);
+      await prefs.setString(AppConfig.userKey, jsonEncode(result.user));
+
+      // Save refresh token if available
+      if (result.refreshToken != null) {
+        await prefs.setString(AppConfig.refreshTokenKey, result.refreshToken!);
+      }
+    }
+
+    DioClient.updateAuthToken(result.token);
+
+    return result.user;
+  }
+
+  Future<Map<String, dynamic>> loginWithPhone({
+    required String phone,
+    required String password,
+    bool rememberMe = true,
+  }) async {
+    final result = await api.loginWithPhone(phone: phone, password: password);
 
     // Save token and user data
     final prefs = await SharedPreferences.getInstance();
@@ -139,6 +164,7 @@ class AuthRepository {
     required String email,
     required String phoneNumber,
     required String password,
+    String? referralCode,
     bool rememberMe = true,
   }) async {
     final result = await api.register(
@@ -147,6 +173,7 @@ class AuthRepository {
       email: email,
       phoneNumber: phoneNumber,
       password: password,
+      referralCode: referralCode,
     );
 
     final prefs = await SharedPreferences.getInstance();
@@ -163,5 +190,31 @@ class AuthRepository {
     }
 
     return result.user;
+  }
+
+  Future<PasswordResetResponse> requestPasswordReset({
+    required String phoneNumber,
+    required String userType,
+    String? deviceId,
+  }) async {
+    return await api.requestPasswordReset(
+      phoneNumber: phoneNumber,
+      userType: userType,
+      deviceId: deviceId,
+    );
+  }
+
+  Future<PasswordResetConfirmResponse> confirmPasswordReset({
+    required String phoneNumber,
+    required String otpCode,
+    required String newPassword,
+    required String userType,
+  }) async {
+    return await api.confirmPasswordReset(
+      phoneNumber: phoneNumber,
+      otpCode: otpCode,
+      newPassword: newPassword,
+      userType: userType,
+    );
   }
 }

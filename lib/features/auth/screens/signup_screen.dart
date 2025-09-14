@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/utils/network_test.dart';
 import '../../../shared/components/phone_input_field.dart';
 import '../bloc/auth_bloc.dart';
 import 'otp_verification_screen.dart';
@@ -22,6 +21,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _referralCodeController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _agreeToTerms = false;
@@ -49,46 +49,6 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  void _testNetworkConnectivity() async {
-    print('🔍 Starting network connectivity test...');
-    final results = await NetworkTest.testConnectivity();
-
-    // Show results in a dialog
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Network Test Results'),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Internet: ${results['internet_connectivity'] ? '✅' : '❌'}'),
-              Text('DNS Resolution: ${results['dns_resolution'] ? '✅' : '❌'}'),
-              Text('Server IP: ${results['server_ip']}'),
-              Text(
-                'Server Reachable: ${results['server_reachable'] ? '✅' : '❌'}',
-              ),
-              Text('API Endpoint: ${results['api_endpoint'] ? '✅' : '❌'}'),
-              const SizedBox(height: 10),
-              Text('Base URL: ${results['base_url']}'),
-              if (results['server_error'] != null)
-                Text('Server Error: ${results['server_error']}'),
-              if (results['api_error'] != null)
-                Text('API Error: ${results['api_error']}'),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -97,6 +57,7 @@ class _SignupScreenState extends State<SignupScreen> {
     _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _referralCodeController.dispose();
     super.dispose();
   }
 
@@ -118,6 +79,9 @@ class _SignupScreenState extends State<SignupScreen> {
                 lastName: _lastNameController.text.trim(),
                 email: _emailController.text.trim(),
                 password: _passwordController.text.trim(),
+                referralCode: _referralCodeController.text.trim().isNotEmpty 
+                    ? _referralCodeController.text.trim() 
+                    : null,
                 otpAlreadySent: true,
               ),
             ),
@@ -317,6 +281,46 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   // Phone Number Field
                   PhoneInputField(controller: _phoneController),
+
+                  const SizedBox(height: 24),
+
+                  // Referral Code Field (Optional)
+                  TextFormField(
+                    controller: _referralCodeController,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      labelText: 'Referral Code (Optional)',
+                      hintText: 'Enter referral code if you have one',
+                      prefixIcon: const Icon(
+                        Feather.gift,
+                        color: Colors.grey,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: AppColors.primary,
+                          width: 2,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      labelStyle: const TextStyle(color: Colors.black),
+                      hintStyle: const TextStyle(color: Colors.grey),
+                    ),
+                    style: const TextStyle(color: Colors.black),
+                    validator: (value) {
+                      // Referral code is optional, so no validation required
+                      return null;
+                    },
+                  ),
 
                   const SizedBox(height: 24),
 

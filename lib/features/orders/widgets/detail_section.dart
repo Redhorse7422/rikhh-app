@@ -5,11 +5,7 @@ class DetailSection extends StatelessWidget {
   final String title;
   final List<DetailRow> details;
 
-  const DetailSection({
-    super.key,
-    required this.title,
-    required this.details,
-  });
+  const DetailSection({super.key, required this.title, required this.details});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +16,7 @@ class DetailSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -54,10 +50,7 @@ class DetailSection extends StatelessWidget {
             width: 120,
             child: Text(
               '${detail.label}:',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.body,
-              ),
+              style: const TextStyle(fontSize: 14, color: AppColors.body),
             ),
           ),
           Expanded(
@@ -80,8 +73,5 @@ class DetailRow {
   final String label;
   final String value;
 
-  DetailRow({
-    required this.label,
-    required this.value,
-  });
+  DetailRow({required this.label, required this.value});
 }

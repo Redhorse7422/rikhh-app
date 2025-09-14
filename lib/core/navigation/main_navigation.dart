@@ -13,7 +13,7 @@ import '../theme/app_colors.dart';
 
 class MainNavigation extends StatefulWidget {
   final int initialIndex;
-  
+
   const MainNavigation({super.key, this.initialIndex = 0});
 
   @override
@@ -22,7 +22,7 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   late int _currentIndex;
-  
+
   // Cache screens to prevent recreation
   late final List<Widget> _screens;
 
@@ -30,7 +30,7 @@ class _MainNavigationState extends State<MainNavigation> {
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
-    
+
     // Initialize all screens once to prevent recreation
     _screens = [
       const HomeScreen(),
@@ -42,10 +42,7 @@ class _MainNavigationState extends State<MainNavigation> {
           });
         },
       ),
-      BlocProvider(
-        create: (context) => OrdersBloc(),
-        child: const OrdersScreen(),
-      ),
+      const OrdersScreen(),
       const ProfileScreen(),
     ];
 
@@ -73,11 +70,9 @@ class _MainNavigationState extends State<MainNavigation> {
         }
       },
       child: Scaffold(
-        body: IndexedStack(
-          index: _currentIndex,
-          children: _screens,
-        ),
-        bottomNavigationBar: _buildBottomNavigation(), // Show bottom nav on all screens including cart
+        body: IndexedStack(index: _currentIndex, children: _screens),
+        bottomNavigationBar:
+            _buildBottomNavigation(), // Show bottom nav on all screens including cart
       ),
     );
   }
@@ -100,6 +95,24 @@ class _MainNavigationState extends State<MainNavigation> {
           setState(() {
             _currentIndex = index;
           });
+
+          // Refresh orders when orders tab is selected
+          if (index == 3) {
+            try {
+              final ordersBloc = context.read<OrdersBloc>();
+              // Always refresh when orders tab is selected to ensure latest data
+              ordersBloc.add(const RefreshOrders(page: 1, limit: 10));
+
+              // Also trigger a second refresh after a delay to catch any delayed backend processing
+              Future.delayed(const Duration(seconds: 3), () {
+                if (mounted) {
+                  ordersBloc.add(const RefreshOrders(page: 1, limit: 10));
+                }
+              });
+            } catch (e) {
+              // If OrdersBloc is not available, ignore
+            }
+          }
         },
         type: BottomNavigationBarType.fixed,
         backgroundColor: AppColors.white,

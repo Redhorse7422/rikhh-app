@@ -34,16 +34,14 @@ class OrderUtils {
     switch (status.toLowerCase()) {
       case 'pending':
         return 'Pending';
-      case 'seller_notified':
-        return 'Seller Notified';
-      case 'seller_accepted':
-        return 'Seller Accepted';
-      case 'confirmed':
-        return 'Confirmed';
+
       case 'processing':
-        return 'Processing';
+      case 'seller_notified':
+      case 'seller_accepted':
+      case 'confirmed':
       case 'shipped':
-        return 'Shipped';
+        return 'Processing';
+
       case 'delivered':
         return 'Delivered';
       case 'cancelled':
@@ -52,6 +50,7 @@ class OrderUtils {
         return 'Refunded';
       case 'returned':
         return 'Returned';
+
       default:
         return status;
     }
@@ -80,16 +79,28 @@ class OrderUtils {
 
   static String formatOrderDate(DateTime date) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
-    
+
     final month = months[date.month - 1];
     final day = date.day.toString().padLeft(2, '0');
     final minute = date.minute.toString().padLeft(2, '0');
     final ampm = date.hour >= 12 ? 'PM' : 'AM';
-    final displayHour = date.hour > 12 ? date.hour - 12 : (date.hour == 0 ? 12 : date.hour);
-    
+    final displayHour = date.hour > 12
+        ? date.hour - 12
+        : (date.hour == 0 ? 12 : date.hour);
+
     return '$month $day, ${date.year}, ${displayHour.toString().padLeft(2, '0')}:$minute $ampm';
   }
 

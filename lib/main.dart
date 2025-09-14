@@ -12,6 +12,7 @@ import 'features/home/bloc/location_bloc.dart';
 import 'core/routes/app_router.dart';
 import 'features/cart/bloc/cart_cubit.dart';
 import 'features/checkout/bloc/checkout_cubit.dart';
+import 'features/orders/bloc/orders_bloc.dart';
 
 void main() {
   // Initialize image cache configuration for better performance
@@ -48,6 +49,9 @@ class MyApp extends StatelessWidget {
           create: (context) => CheckoutCubit(
             cartCubit: context.read<CartCubit>(),
           ),
+        ),
+        BlocProvider<OrdersBloc>(
+          create: (context) => OrdersBloc(),
         ),
       ],
       child: MaterialApp.router(

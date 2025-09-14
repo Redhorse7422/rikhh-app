@@ -16,13 +16,23 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _rememberMe = true;
+  bool _isEmailLogin = true; // Toggle between email and phone login
+
+  @override
+  void initState() {
+    super.initState();
+    _phoneController.addListener(_formatPhoneNumber);
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
+    _phoneController.removeListener(_formatPhoneNumber);
+    _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -163,22 +173,27 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const SizedBox(height: 20),
 
-                              // Email field
+                              // Login Type Toggle
+                              _buildLoginTypeToggle(),
+                              const SizedBox(height: 20),
+
+                              // Email/Phone field
                               _buildTextField(
-                                controller: _emailController,
-                                hint: 'Email address',
-                                icon: Feather.mail,
-                                keyboardType: TextInputType.emailAddress,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your email';
-                                  }
-                                  if (!value.contains('@') ||
-                                      !value.contains('.')) {
-                                    return 'Please enter a valid email';
-                                  }
-                                  return null;
-                                },
+                                controller: _isEmailLogin
+                                    ? _emailController
+                                    : _phoneController,
+                                hint: _isEmailLogin
+                                    ? 'Email address'
+                                    : '+91 (123) 456-7890',
+                                icon: _isEmailLogin
+                                    ? Feather.mail
+                                    : Feather.phone,
+                                keyboardType: _isEmailLogin
+                                    ? TextInputType.emailAddress
+                                    : TextInputType.phone,
+                                validator: _isEmailLogin
+                                    ? _validateEmail
+                                    : _validatePhone,
                               ),
                               const SizedBox(height: 12),
 
@@ -232,18 +247,25 @@ class _LoginScreenState extends State<LoginScreen> {
                                       fontSize: 14,
                                     ),
                                   ),
-                                  // const Spacer(),
-                                  // TextButton(
-                                  //   onPressed: () {},
-                                  //   child: Text(
-                                  //     'Forgot Password?',
-                                  //     style: TextStyle(
-                                  //       color: AppColors.primary,
-                                  //       fontSize: 14,
-                                  //       fontWeight: FontWeight.w500,
-                                  //     ),
-                                  //   ),
-                                  // ),
+                                  //
+                                  const Spacer(),
+                                  TextButton(
+                                    onPressed: isLoading
+                                        ? null
+                                        : () {
+                                            context.push(
+                                              '/password-reset-request',
+                                            );
+                                          },
+                                    child: Text(
+                                      'Forgot Password?',
+                                      style: TextStyle(
+                                        color: AppColors.primary,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
 
@@ -300,11 +322,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                               .validate()) {
                                             context.read<AuthBloc>().add(
                                               AuthLoginRequested(
-                                                email: _emailController.text
-                                                    .trim(),
+                                                email: _isEmailLogin
+                                                    ? _emailController.text
+                                                          .trim()
+                                                    : null,
+                                                phone: _isEmailLogin
+                                                    ? null
+                                                    : _phoneController.text
+                                                          .replaceAll(
+                                                            RegExp(r'[^\d+]'),
+                                                            '',
+                                                          ),
                                                 password:
                                                     _passwordController.text,
                                                 rememberMe: _rememberMe,
+                                                loginType: _isEmailLogin
+                                                    ? LoginType.email
+                                                    : LoginType.phone,
                                               ),
                                             );
                                           }
@@ -493,5 +527,160 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildLoginTypeToggle() {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF2F4F7),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _isEmailLogin = true;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: _isEmailLogin ? AppColors.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Feather.mail,
+                      size: 16,
+                      color: _isEmailLogin ? Colors.white : AppColors.body,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Email',
+                      style: TextStyle(
+                        color: _isEmailLogin ? Colors.white : AppColors.body,
+                        fontWeight: _isEmailLogin
+                            ? FontWeight.w600
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _isEmailLogin = false;
+                  // Initialize phone field with +91 if empty
+                  if (_phoneController.text.isEmpty) {
+                    _phoneController.text = '+91 ';
+                  }
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: !_isEmailLogin
+                      ? AppColors.primary
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Feather.phone,
+                      size: 16,
+                      color: !_isEmailLogin ? Colors.white : AppColors.body,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Phone',
+                      style: TextStyle(
+                        color: !_isEmailLogin ? Colors.white : AppColors.body,
+                        fontWeight: !_isEmailLogin
+                            ? FontWeight.w600
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    }
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+      return 'Please enter a valid email';
+    }
+    return null;
+  }
+
+  String? _validatePhone(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your phone number';
+    }
+    // Remove +91 prefix and all non-digit characters for validation
+    final phoneDigits = value
+        .replaceAll('+91', '')
+        .replaceAll(RegExp(r'[^\d]'), '');
+    if (phoneDigits.length < 10) {
+      return 'Please enter a valid phone number (at least 10 digits)';
+    }
+    if (phoneDigits.length > 10) {
+      return 'Please enter a valid 10-digit phone number';
+    }
+    return null;
+  }
+
+  void _formatPhoneNumber() {
+    final text = _phoneController.text;
+
+    // Ensure +91 prefix is always present
+    if (!text.startsWith('+91')) {
+      _phoneController.text = '+91 ' + text;
+      return;
+    }
+
+    // Remove +91 prefix and non-digit characters for processing
+    String cleanText = text
+        .replaceAll('+91', '')
+        .replaceAll(RegExp(r'[^\d]'), '');
+
+    if (cleanText.length <= 10) {
+      String formatted = '+91 ';
+      if (cleanText.isNotEmpty) {
+        if (cleanText.length <= 3) {
+          formatted += '($cleanText';
+        } else if (cleanText.length <= 6) {
+          formatted +=
+              '(${cleanText.substring(0, 3)}) ${cleanText.substring(3)}';
+        } else {
+          formatted +=
+              '(${cleanText.substring(0, 3)}) ${cleanText.substring(3, 6)}-${cleanText.substring(6)}';
+        }
+      }
+
+      if (formatted != text) {
+        _phoneController.value = _phoneController.value.copyWith(
+          text: formatted,
+          selection: TextSelection.collapsed(offset: formatted.length),
+        );
+      }
+    }
   }
 }

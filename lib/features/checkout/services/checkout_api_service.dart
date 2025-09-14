@@ -145,6 +145,95 @@ class CheckoutApiService {
     }
   }
 
+  /// Update address
+  Future<Address> updateAddress(
+    Map<String, dynamic> userData,
+    String addressId,
+    Address address,
+  ) async {
+    try {
+      final response = await _dio.put(
+        '$_v1/addresses/$addressId',
+        data: address.toJson(),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = (response.data is Map<String, dynamic>)
+            ? response.data as Map<String, dynamic>
+            : Map<String, dynamic>.from(response.data);
+
+        final addressData = data['data'] ?? {};
+
+        final updatedAddress = Address.fromJson(addressData);
+
+        return updatedAddress;
+      } else {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          type: DioExceptionType.badResponse,
+          error: 'Request failed with status: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Delete address
+  Future<void> deleteAddress(
+    Map<String, dynamic> userData,
+    String addressId,
+  ) async {
+    try {
+      final response = await _dio.delete('$_v1/addresses/$addressId');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      } else {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          type: DioExceptionType.badResponse,
+          error: 'Request failed with status: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Set address as default
+  Future<Address> setDefaultAddress(
+    Map<String, dynamic> userData,
+    String addressId,
+  ) async {
+    try {
+      final response = await _dio.put('$_v1/addresses/$addressId/default');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = (response.data is Map<String, dynamic>)
+            ? response.data as Map<String, dynamic>
+            : Map<String, dynamic>.from(response.data);
+
+        final addressData = data['data'] ?? {};
+
+        final updatedAddress = Address.fromJson(addressData);
+
+        return updatedAddress;
+      } else {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          type: DioExceptionType.badResponse,
+          error: 'Request failed with status: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// Phase 2: Checkout Initiation
 
   /// Initiate checkout
@@ -294,8 +383,39 @@ class CheckoutApiService {
             ? response.data as Map<String, dynamic>
             : Map<String, dynamic>.from(response.data);
 
+        // Validate response structure
+        if (data['code'] != 0 && data['success'] != true) {
+          throw DioException(
+            requestOptions: response.requestOptions,
+            response: response,
+            type: DioExceptionType.badResponse,
+            error:
+                'Order confirmation failed: ${data['message'] ?? 'Unknown error'}',
+          );
+        }
+
         final dataContent = data['data'] ?? {};
         final orderData = dataContent['order'] ?? {};
+
+        // Validate that we have order data
+        if (orderData.isEmpty) {
+          throw DioException(
+            requestOptions: response.requestOptions,
+            response: response,
+            type: DioExceptionType.badResponse,
+            error: 'Order confirmation failed: No order data in response',
+          );
+        }
+
+        // Validate required order fields
+        if (orderData['id'] == null || orderData['orderNumber'] == null) {
+          throw DioException(
+            requestOptions: response.requestOptions,
+            response: response,
+            type: DioExceptionType.badResponse,
+            error: 'Order confirmation failed: Missing required order fields',
+          );
+        }
 
         final order = Order.fromJson(orderData);
 

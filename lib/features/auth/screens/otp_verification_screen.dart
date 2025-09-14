@@ -14,6 +14,7 @@ class OtpVerificationScreen extends StatefulWidget {
   final String? lastName;
   final String? email;
   final String? password;
+  final String? referralCode;
   final bool otpAlreadySent;
 
   const OtpVerificationScreen({
@@ -24,6 +25,7 @@ class OtpVerificationScreen extends StatefulWidget {
     this.lastName,
     this.email,
     this.password,
+    this.referralCode,
     this.otpAlreadySent = false,
   });
 
@@ -169,6 +171,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     email: widget.email!,
                     phoneNumber: widget.phoneNumber,
                     password: widget.password!,
+                    referralCode: widget.referralCode,
                   ),
                 );
               } else {

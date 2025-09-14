@@ -19,6 +19,7 @@ import '../../products/models/product_model.dart';
 import '../../products/screens/product_detail_screen.dart';
 import '../bloc/location_bloc.dart';
 import 'location_picker_screen.dart';
+import '../../profile/screens/wallet_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -346,7 +347,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               Responsive.hSpace(context, 16),
 
               // Wallet Icon
-              Icon(Feather.credit_card, color: AppColors.heading, size: 24),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const WalletScreen(),
+                    ),
+                  );
+                },
+                child: Icon(Feather.credit_card, color: AppColors.heading, size: 24),
+              ),
 
               Responsive.hSpace(context, 16),
 

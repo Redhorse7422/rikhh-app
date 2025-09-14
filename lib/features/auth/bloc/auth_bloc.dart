@@ -19,6 +19,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<PhoneOtpResendRequested>(_onPhoneOtpResendRequested);
     on<PhoneVerificationResetRequested>(_onPhoneVerificationResetRequested);
     on<AuthRegistrationRequested>(_onRegistrationRequested);
+    on<AuthRefreshUserDataRequested>(_onRefreshUserDataRequested);
+    on<PasswordResetRequested>(_onPasswordResetRequested);
+    on<PasswordResetConfirmRequested>(_onPasswordResetConfirmRequested);
+    on<PasswordResetResetRequested>(_onPasswordResetResetRequested);
   }
 
   Future<void> _onLoginRequested(
@@ -27,11 +31,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       emit(AuthLoading());
-      final user = await _repo.login(
-        email: event.email,
-        password: event.password,
-        rememberMe: event.rememberMe,
-      );
+      Map<String, dynamic> user;
+      
+      if (event.loginType == LoginType.email) {
+        if (event.email == null) {
+          throw Exception('Email is required for email login');
+        }
+        user = await _repo.login(
+          email: event.email!,
+          password: event.password,
+          rememberMe: event.rememberMe,
+        );
+      } else {
+        if (event.phone == null) {
+          throw Exception('Phone number is required for phone login');
+        }
+        user = await _repo.loginWithPhone(
+          phone: event.phone!,
+          password: event.password,
+          rememberMe: event.rememberMe,
+        );
+      }
+      
       emit(AuthAuthenticated(user: user));
     } catch (e) {
       emit(AuthError(e.toString()));
@@ -66,18 +87,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-      print('🔍 BLOC: Sending OTP request for phone: ${event.phoneNumber}');
       emit(AuthLoading());
       final response = await _repo.sendPhoneVerificationOtp(
         phoneNumber: event.phoneNumber,
         deviceId: event.deviceId,
       );
 
-      print('🔍 BLOC: OTP Response code: ${response.code}');
-      print('🔍 BLOC: OTP Response message: ${response.message}');
 
       if (response.code == 0) {
-        print('🔍 BLOC: OTP sent successfully');
         emit(
           PhoneVerificationOtpSent(
             otpId: response.data.otpId,
@@ -86,11 +103,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           ),
         );
       } else {
-        print('🔍 BLOC: OTP send failed with message: ${response.message}');
         emit(AuthError(response.message));
       }
     } catch (e) {
-      print('🔍 BLOC: OTP send error: $e');
       emit(AuthError(e.toString()));
     }
   }
@@ -160,7 +175,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-      print('🔍 BLOC: Registration request for phone: ${event.phoneNumber}');
       emit(AuthLoading());
 
       final user = await _repo.register(
@@ -169,12 +183,87 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         email: event.email,
         phoneNumber: event.phoneNumber,
         password: event.password,
+        referralCode: event.referralCode,
       );
-      print('🔍 BLOC: Registration successful');
       emit(AuthRegistrationSuccess(user: user));
     } catch (e) {
-      print('🔍 BLOC: Registration error: $e');
       emit(AuthError(e.toString()));
     }
+  }
+
+  Future<void> _onRefreshUserDataRequested(
+    AuthRefreshUserDataRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      final user = await _repo.getUser();
+      if (user != null) {
+        emit(AuthAuthenticated(user: user));
+      } else {
+        emit(AuthUnauthenticated());
+      }
+    } catch (e) {
+      emit(AuthError('Failed to refresh user data: ${e.toString()}'));
+    }
+  }
+
+  Future<void> _onPasswordResetRequested(
+    PasswordResetRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      emit(AuthLoading());
+      final response = await _repo.requestPasswordReset(
+        phoneNumber: event.phoneNumber,
+        userType: event.userType,
+        deviceId: event.deviceId,
+      );
+
+
+      if (response.code == 0) {
+        emit(
+          PasswordResetOtpSent(
+            otpId: response.data.otpId,
+            phoneNumber: event.phoneNumber,
+            expiresAt: DateTime.parse(response.data.expiresAt),
+          ),
+        );
+      } else {
+        emit(AuthError(response.message));
+      }
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> _onPasswordResetConfirmRequested(
+    PasswordResetConfirmRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      emit(AuthLoading());
+      final response = await _repo.confirmPasswordReset(
+        phoneNumber: event.phoneNumber,
+        otpCode: event.otpCode,
+        newPassword: event.newPassword,
+        userType: event.userType,
+      );
+
+
+      if (response.code == 0) {
+        emit(PasswordResetSuccess(message: response.message));
+      } else {
+        emit(AuthError(response.message));
+      }
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> _onPasswordResetResetRequested(
+    PasswordResetResetRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(PasswordResetReset());
   }
 }

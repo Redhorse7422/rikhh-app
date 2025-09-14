@@ -4,8 +4,11 @@ import '../../../core/theme/app_colors.dart';
 
 enum OrderProgressStep {
   pending,
+  confirmed,
+  processing,
   shipped,
   delivered,
+  cancelled,
 }
 
 class OrderProgressTracker extends StatelessWidget {
@@ -31,7 +34,7 @@ class OrderProgressTracker extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -67,25 +70,44 @@ class OrderProgressTracker extends StatelessWidget {
     switch (status.toLowerCase()) {
       case 'pending':
       case 'seller_notified':
+        return OrderProgressStep.pending;
       case 'seller_accepted':
       case 'confirmed':
+        return OrderProgressStep.confirmed;
       case 'processing':
-        return OrderProgressStep.pending;
+        return OrderProgressStep.processing;
       case 'shipped':
         return OrderProgressStep.shipped;
       case 'delivered':
         return OrderProgressStep.delivered;
+      case 'cancelled':
+        return OrderProgressStep.cancelled;
       default:
         return OrderProgressStep.pending;
     }
   }
 
   Widget _buildProgressSteps(OrderProgressStep currentStep) {
+    // Handle cancelled orders separately
+    if (currentStep == OrderProgressStep.cancelled) {
+      return _buildCancelledStep();
+    }
+
     final steps = [
       _ProgressStepData(
         step: OrderProgressStep.pending,
         icon: Feather.shopping_bag,
         label: 'Pending',
+      ),
+      _ProgressStepData(
+        step: OrderProgressStep.confirmed,
+        icon: Feather.check,
+        label: 'Confirmed',
+      ),
+      _ProgressStepData(
+        step: OrderProgressStep.processing,
+        icon: Feather.settings,
+        label: 'Processing',
       ),
       _ProgressStepData(
         step: OrderProgressStep.shipped,
@@ -148,9 +170,54 @@ class OrderProgressTracker extends StatelessWidget {
     );
   }
 
+  Widget _buildCancelledStep() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.error.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: AppColors.error.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppColors.error,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Feather.x_circle,
+              size: 20,
+              color: AppColors.white,
+            ),
+          ),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Text(
+              'Order Cancelled',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.error,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   bool _isStepCompleted(OrderProgressStep step, OrderProgressStep currentStep) {
     final stepOrder = [
       OrderProgressStep.pending,
+      OrderProgressStep.confirmed,
+      OrderProgressStep.processing,
       OrderProgressStep.shipped,
       OrderProgressStep.delivered,
     ];

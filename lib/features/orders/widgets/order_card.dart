@@ -21,7 +21,7 @@ class OrderCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -103,7 +103,7 @@ class OrderCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: OrderUtils.getStatusColor(
                             order.status,
-                          ).withOpacity(0.1),
+                          ).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -129,14 +129,13 @@ class OrderCard extends StatelessWidget {
               style: const TextStyle(fontSize: 14, color: AppColors.body),
             ),
 
-            const SizedBox(height: 8),
+            // const SizedBox(height: 8),
 
             // Delivery Information
-            Text(
-              OrderUtils.getDeliveryInfo(order),
-              style: const TextStyle(fontSize: 14, color: AppColors.body),
-            ),
-
+            // Text(
+            //   OrderUtils.getDeliveryInfo(order),
+            //   style: const TextStyle(fontSize: 14, color: AppColors.body),
+            // ),
             const SizedBox(height: 12),
 
             // Price and Quantity Row

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../shared/components/checkout_scaffold.dart';
 import '../models/checkout_models.dart';
+import '../../orders/bloc/orders_bloc.dart';
 
 class OrderConfirmationScreen extends StatelessWidget {
   final Order order;
@@ -301,7 +303,15 @@ class OrderConfirmationScreen extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              // Refresh orders before navigating to home (in case user goes to orders later)
+              context.read<OrdersBloc>().add(
+                const RefreshOrders(page: 1, limit: 10),
+              );
+
+              // Wait for refresh to complete
+              await Future.delayed(const Duration(seconds: 2));
+
               // Navigate to home screen
               context.go('/main/home');
             },
@@ -315,9 +325,18 @@ class OrderConfirmationScreen extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: OutlinedButton(
-            onPressed: () {
-              // Navigate to orders screen
-              context.go('/orders');
+            onPressed: () async {
+              // Refresh orders before navigating to orders screen
+
+              context.read<OrdersBloc>().add(
+                const RefreshOrders(page: 1, limit: 10),
+              );
+
+              // Wait longer for the refresh to complete and backend processing
+              await Future.delayed(const Duration(seconds: 3));
+
+              // Navigate to orders screen (tab index 3)
+              context.go('/main?tab=3');
             },
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),

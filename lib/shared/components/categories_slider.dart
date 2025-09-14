@@ -29,7 +29,6 @@ class CategoriesSlider extends StatelessWidget {
           final isSelected = selectedIndex != null
               ? index == selectedIndex
               : index == -1;
-
           return GestureDetector(
             onTap: () {
               if (onCategorySelected != null) {

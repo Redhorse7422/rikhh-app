@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import '../../core/theme/app_colors.dart';
+import 'optimized_image.dart';
 
 class CategoryCard extends StatelessWidget {
   final String image;
@@ -22,7 +23,7 @@ class CategoryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Product Image Container
+          // Category Image Container
           Container(
             height: 110,
             width: double.infinity,
@@ -32,12 +33,22 @@ class CategoryCard extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(12)),
-              child: Container(
-                color: AppColors.divider,
-                child: Center(
-                  child: Icon(Feather.image, color: AppColors.body, size: 40),
-                ),
-              ),
+              child: image.isNotEmpty && image.startsWith('http')
+                  ? OptimizedImage(
+                      imageUrl: image,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 110,
+                      errorWidget: Center(
+                        child: Icon(Feather.image, color: AppColors.body, size: 40),
+                      ),
+                    )
+                  : Container(
+                      color: AppColors.divider,
+                      child: Center(
+                        child: Icon(Feather.image, color: AppColors.body, size: 40),
+                      ),
+                    ),
             ),
           ),
           const SizedBox(height: 6),
